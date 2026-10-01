@@ -2,14 +2,14 @@ import { scales, paletteMap, focusPalettes, semantic, fontFamily, borderRadius, 
 
 // Brikz Design System, Platform UI clara: os nomes de paleta do Tailwind (blue, gray, purple...) sao
 // ALIASES das escalas brikz. `bg-blue-600` renderiza o primario preto (#0a0a0a); cyan so via `cyan-*` /
-// `accent`. Focus/selecao (ring-*, border-*-400..600) dessas paletas continuam cyan. Ver src/styles/brikzTokens.js.
+// `accent`. Focus/ring (ring-*, border-*-400..500) dessas paletas continuam cyan. Ver src/styles/brikzTokens.js.
 const remappedPalettes = Object.fromEntries(
   Object.entries(paletteMap).map(([palette, scale]) => [palette, scales[scale]]),
 );
 
-const focusRing = Object.fromEntries(focusPalettes.map(p => [p, scales.accent]));
+const focusRing = { DEFAULT: scales.accent['500'], ...Object.fromEntries(focusPalettes.map(p => [p, scales.accent])) };
 const focusBorder = Object.fromEntries(
-  focusPalettes.map(p => [p, { 400: scales.accent['400'], 500: scales.accent['500'], 600: scales.accent['600'] }]),
+  focusPalettes.map(p => [p, { 400: scales.accent['400'], 500: scales.accent['500'] }]),
 );
 
 /** @type {import('tailwindcss').Config} */
