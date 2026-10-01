@@ -13,7 +13,11 @@ test('logos oficiais publicados', () => {
 test('index.html em pt-BR com favicon brikz', () => {
   const html = read('index.html');
   assert.match(html, /<html lang="pt-BR">/);
-  assert.match(html, /<link rel="icon" type="image\/png" href="\/brand\/logo-transparent\.png"/);
+  assert.match(html, /<link rel="icon" href="\/favicon\.ico"/);
+  assert.match(html, /<link rel="icon" type="image\/png" sizes="32x32" href="\/brand\/favicon-32\.png"/);
+  for (const f of ['public/favicon.ico', 'public/brand/favicon-32.png', 'public/brand/favicon-180.png']) {
+    assert.ok(existsSync(new URL(`../${f}`, import.meta.url)), f);
+  }
 });
 
 test('sidebar expandida mostra o logo brikz', () => {
