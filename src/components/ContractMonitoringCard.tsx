@@ -29,7 +29,7 @@ export const ContractMonitoringCard: React.FC<ContractMonitoringCardProps> = ({
   const status = (() => {
     switch (monitoring.status) {
       case 'functional':
-        return { cardBg: 'bg-emerald-50', cardBorder: 'border-emerald-200', cardHover: 'hover:shadow-emerald-100', label: 'OK', accent: 'text-emerald-700', badgeBg: 'bg-emerald-100', ring: 'ring-emerald-300', icon: <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />, labelColor: 'text-emerald-500', metricLabel: 'text-emerald-400', footerBorder: 'border-emerald-200/60', footerText: 'text-emerald-500', daysColor: 'text-emerald-600 font-semibold' };
+        return { cardBg: 'bg-green-50', cardBorder: 'border-green-200', cardHover: 'hover:shadow-green-100', label: 'OK', accent: 'text-green-700', badgeBg: 'bg-green-100', ring: 'ring-green-300', icon: <CheckCircle className="w-3.5 h-3.5 text-green-600" />, labelColor: 'text-green-500', metricLabel: 'text-green-400', footerBorder: 'border-green-200/60', footerText: 'text-green-500', daysColor: 'text-green-600 font-semibold' };
       case 'insufficient':
         return { cardBg: 'bg-amber-50', cardBorder: 'border-amber-200', cardHover: 'hover:shadow-amber-100', label: 'Com falha', accent: 'text-amber-700', badgeBg: 'bg-amber-100', ring: 'ring-amber-300', icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />, labelColor: 'text-amber-500', metricLabel: 'text-amber-400', footerBorder: 'border-amber-200/60', footerText: 'text-amber-500', daysColor: '' };
       case 'no_generation':
@@ -39,7 +39,7 @@ export const ContractMonitoringCard: React.FC<ContractMonitoringCardProps> = ({
     }
   })();
 
-  const barColor = pct >= 100 ? 'bg-emerald-500' : pct >= 75 ? 'bg-blue-500' : pct >= 50 ? 'bg-amber-400' : 'bg-red-500';
+  const barColor = pct >= 100 ? 'bg-green-500' : pct >= 75 ? 'bg-blue-500' : pct >= 50 ? 'bg-amber-400' : 'bg-red-500';
 
   const daysText = monitoring.daysRemaining <= 3 && monitoring.status !== 'functional'
     ? 'text-red-600 font-semibold'
@@ -94,8 +94,8 @@ export const ContractMonitoringCard: React.FC<ContractMonitoringCardProps> = ({
       {/* futuro */}
       {(monitoring.valorFuturo ?? 0) > 0 && (
         <div className="mx-4 mb-3 px-3 py-2 bg-white/50 rounded-lg flex items-center justify-between">
-          <span className="text-[10px] text-emerald-600 font-medium uppercase tracking-wide">A liquidar (futuro)</span>
-          <span className="text-xs font-bold text-emerald-700">{brl(monitoring.valorFuturo ?? 0)}</span>
+          <span className="text-[10px] text-green-600 font-medium uppercase tracking-wide">A liquidar (futuro)</span>
+          <span className="text-xs font-bold text-green-700">{brl(monitoring.valorFuturo ?? 0)}</span>
         </div>
       )}
 

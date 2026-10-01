@@ -57,7 +57,7 @@ const mockRoles = [
     id: 'analyst',
     name: 'Analista',
     description: 'Operações e análise de dados',
-    color: 'emerald',
+    color: 'green',
     permissions: {
       'Gerenciar usuários': false,
       'Gerenciar perfis': false,
@@ -232,7 +232,7 @@ const RolePermissionsTab: React.FC = () => {
   const colorMap: Record<string, { bg: string; border: string; text: string; badge: string }> = {
     red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', badge: 'bg-red-100 text-red-800' },
     blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-800' },
-    emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-800' },
+    green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', badge: 'bg-green-100 text-green-800' },
     gray: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', badge: 'bg-gray-100 text-gray-800' },
   };
 

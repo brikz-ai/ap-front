@@ -69,7 +69,7 @@ const getEventoBadge = (evento: ContaCorrenteEvento) => {
   const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium';
   const map: Record<ContaCorrenteEvento, string> = {
     contrato_criado: `${base} bg-blue-100 text-blue-800`,
-    liquidacao_total: `${base} bg-emerald-100 text-emerald-800`,
+    liquidacao_total: `${base} bg-green-100 text-green-800`,
     liquidacao_parcial: `${base} bg-teal-100 text-teal-800`,
     nao_liquidada_na_data: `${base} bg-orange-100 text-orange-800`,
     chargeback: `${base} bg-red-100 text-red-800`,

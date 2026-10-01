@@ -98,11 +98,11 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">Total</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{contractMonitoring.length}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 cursor-pointer hover:ring-1 hover:ring-emerald-300 transition-all" onClick={() => setStatusFilter(statusFilter === 'functional' ? 'all' : 'functional')}>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 cursor-pointer hover:ring-1 hover:ring-green-300 transition-all" onClick={() => setStatusFilter(statusFilter === 'functional' ? 'all' : 'functional')}>
           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" /> OK
+            <span className="w-2 h-2 rounded-full bg-green-500" /> OK
           </p>
-          <p className="text-2xl font-bold text-emerald-600 mt-1">{totOk}</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">{totOk}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 cursor-pointer hover:ring-1 hover:ring-amber-300 transition-all" onClick={() => setStatusFilter(statusFilter === 'insufficient' ? 'all' : 'insufficient')}>
           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium flex items-center gap-1.5">
@@ -134,7 +134,7 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
 
           {/* status pills */}
           {([
-            { value: 'functional', label: 'OK', dot: 'bg-emerald-500' },
+            { value: 'functional', label: 'OK', dot: 'bg-green-500' },
             { value: 'insufficient', label: 'Com falha', dot: 'bg-amber-500' },
             { value: 'no_generation', label: 'Crítico', dot: 'bg-red-500' },
           ] as const).map(s => (

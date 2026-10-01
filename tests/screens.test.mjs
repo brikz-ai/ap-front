@@ -30,3 +30,14 @@ for (const f of ['ClientTable', 'PartnerRegistrationModule']) {
 test('ClientTable usa tabela brikz', () => {
   assert.match(read('ClientTable'), /table-brikz/);
 });
+
+test('status de sucesso usam green', () => {
+  for (const f of ['DailyMonitoringDashboard', 'ContractMonitoringCard']) {
+    assert.doesNotMatch(read(f), /emerald/, `${f} ainda usa emerald`);
+  }
+  for (const f of ['ContractDetail', 'DisputesModule', 'ReceivablesLedgerModule']) {
+    const src = read(f);
+    const line = src.split('\n').find(l => l.includes('liquidacao_total'));
+    assert.ok(line && !/emerald/.test(line), `${f}: liquidacao_total ainda emerald`);
+  }
+});
