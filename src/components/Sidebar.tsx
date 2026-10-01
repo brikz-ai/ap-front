@@ -44,27 +44,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
   const [accessManagementExpanded, setAccessManagementExpanded] = useState(false);
 
   const btnClass = (active: boolean) =>
-    `w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-colors text-sm ${
+    `w-full flex items-center px-3 py-2 rounded-md text-left transition-colors text-[13.5px] ${
       active
-        ? 'bg-emerald-50 text-emerald-700 font-medium'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        ? "relative bg-gray-100 text-gray-900 font-medium before:content-[''] before:absolute before:-left-3 before:top-2 before:bottom-2 before:w-0.5 before:rounded before:bg-cyan-600"
+        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
     }`;
 
   const iconClass = (active: boolean) =>
-    `w-[18px] h-[18px] mr-3 flex-shrink-0 ${active ? 'text-emerald-600' : 'text-gray-400'}`;
+    `w-[18px] h-[18px] mr-3 flex-shrink-0 ${active ? 'text-gray-900' : 'text-gray-400'}`;
 
   const subBtnClass = (active: boolean) =>
-    `w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+    `w-full text-left px-3 py-2 rounded-md transition-colors text-[13.5px] ${
       active
-        ? 'text-emerald-700 font-medium bg-emerald-50'
+        ? "relative bg-gray-100 text-gray-900 font-medium before:content-[''] before:absolute before:-left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:rounded before:bg-cyan-600"
         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
     }`;
 
   const expandBtnClass = (active: boolean) =>
-    `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-colors text-sm ${
+    `w-full flex items-center justify-between px-3 py-2 rounded-md text-left transition-colors text-[13.5px] ${
       active
-        ? 'bg-emerald-50 text-emerald-700 font-medium'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        ? "relative bg-gray-100 text-gray-900 font-medium before:content-[''] before:absolute before:-left-3 before:top-2 before:bottom-2 before:w-0.5 before:rounded before:bg-cyan-600"
+        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
     }`;
 
   const monitoringSubItems = [
@@ -139,8 +139,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
             }}
             className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
               active
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'
             }`}
             aria-label={item.label}
           >
@@ -156,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
     };
 
     return (
-      <div className="bg-white border-r border-gray-100 h-screen w-16 fixed left-0 top-0 z-30 flex-col hidden lg:flex">
+      <div className="bg-white border-r border-gray-200 h-screen w-16 fixed left-0 top-0 z-30 flex-col hidden lg:flex">
         {/* Logo */}
         <div className="flex items-center justify-center h-16 flex-shrink-0 border-b border-gray-100">
           <button
@@ -220,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
           )}
         </button>
         {expanded && (
-          <div className="mt-1 ml-5 pl-4 border-l border-gray-200 space-y-1">
+          <div className="mt-1 ml-6 pl-2.5 border-l border-gray-200 space-y-1">
             {subItems.map((subItem) => (
               <button
                 key={subItem.id}
@@ -259,7 +259,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
         onClick={onToggleCollapse}
       />
 
-      <div className="bg-white border-r border-gray-100 h-screen w-[280px] sm:w-64 fixed left-0 top-0 z-30 flex flex-col">
+      <div className="bg-white border-r border-gray-200 h-screen w-[280px] sm:w-64 fixed left-0 top-0 z-30 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 flex-shrink-0 border-b border-gray-100">
           <img src="/brand/logo-on-light.png" alt="brikz" className="h-7 w-auto" />
@@ -276,7 +276,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-4 pt-6">
           {/* PRINCIPAL section */}
-          <p className="px-3 mb-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Principal</p>
+          <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Principal</p>
 
           <div className="space-y-1">
             {renderSimple('partner-registration', UserPlus, 'Cadastro')}
@@ -287,7 +287,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
           {/* ACOMPANHAMENTO section — oculta temporariamente */}
           {SHOW_ACOMPANHAMENTO && (
             <>
-              <p className="px-3 mt-8 mb-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Acompanhamento</p>
+              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Acompanhamento</p>
               <div className="space-y-1">
                 {renderExpandable('monitoring-group', BarChart3, 'Monitoramento', monitoringExpanded, setMonitoringExpanded, monitoringSubItems)}
                 {renderExpandable('reports-group', FileText, 'Relatórios', reportsExpanded, setReportsExpanded, reportsSubItems)}
@@ -299,7 +299,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
           {/* CONFIGURACOES section (inclui Gestão de acessos) — oculta temporariamente */}
           {SHOW_CONFIGURACOES && (
             <>
-              <p className="px-3 mt-8 mb-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Configurações</p>
+              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Configurações</p>
               <div className="space-y-1">
                 {renderExpandable('config-group', Settings, 'Geral', configExpanded, setConfigExpanded, configSubItems)}
                 {renderExpandable('access-management-group', Shield, 'Gestão de acessos', accessManagementExpanded, setAccessManagementExpanded, accessManagementSubItems)}

@@ -34,6 +34,8 @@ import {
 import { Client, Contract } from './types';
 import { useData } from './context/DataContext';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { PageHeader } from './components/ui';
+import { getSectionGroup } from './navigation/sectionGroups';
 
 const LazyContractDetail = React.lazy(() =>
   import('./components/ContractDetail').then(module => ({ default: module.ContractDetail }))
@@ -490,7 +492,7 @@ function App() {
 
   return (
     <>
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-white min-h-screen">
         <Sidebar
           activeSection={activeSection}
           setActiveSection={setActiveSection}
@@ -503,6 +505,7 @@ function App() {
           onLogout={handleLogout}
           sidebarCollapsed={sidebarCollapsed}
           pageTitle={pageTitle}
+          sectionGroup={getSectionGroup(activeSection)}
           onSearchClick={() => setShowGlobalSearch(true)}
         />
         <button
@@ -512,7 +515,8 @@ function App() {
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div className={`ml-0 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} px-3 sm:px-4 md:px-6 pb-6 pt-[72px] sm:pt-[88px] transition-all duration-300`}>
+        <div className={`ml-0 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} app-canvas px-4 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[104px] transition-all duration-300`}>
+          <PageHeader eyebrow={getSectionGroup(activeSection)} title={pageTitle} />
           <React.Suspense fallback={<LoadingSpinner size="lg" text="Carregando..." fullScreen />}>
             {renderContent()}
           </React.Suspense>
