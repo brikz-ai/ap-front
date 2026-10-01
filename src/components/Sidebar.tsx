@@ -261,7 +261,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
 
       <div className="bg-white border-r border-gray-100 h-screen w-[280px] sm:w-64 fixed left-0 top-0 z-30 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-end px-5 h-16 flex-shrink-0 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 h-16 flex-shrink-0 border-b border-gray-100">
+          <img src="/brand/logo-on-light.png" alt="brikz" className="h-7 w-auto" />
           <button
             onClick={onToggleCollapse}
             className="p-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
