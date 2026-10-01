@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -16,6 +16,17 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 # Garantir que public/ (com massa_ur.csv, massa_contratos.csv) seja copiado antes do build
 COPY public/massa_ur.csv public/massa_contratos.csv ./public/
+
+# Variaveis VITE_* sao embutidas no bundle no build (o .env nao entra na imagem;
+# ver .dockerignore). Passe via --build-arg / substitutions do Cloud Build.
+ARG VITE_CONTRATOS_API_BASE_URL
+ARG VITE_CONTRATOS_DEV_JWT
+ARG VITE_FINANCIADOR_ID
+ARG VITE_OPTIN_API_BASE_URL
+ARG VITE_OPTIN_DEV_JWT
+ARG VITE_AGENDA_API_BASE_URL
+ARG VITE_AGENDA_DEV_JWT
+ENV VITE_CONTRATOS_API_BASE_URL=$VITE_CONTRATOS_API_BASE_URL     VITE_CONTRATOS_DEV_JWT=$VITE_CONTRATOS_DEV_JWT     VITE_FINANCIADOR_ID=$VITE_FINANCIADOR_ID     VITE_OPTIN_API_BASE_URL=$VITE_OPTIN_API_BASE_URL     VITE_OPTIN_DEV_JWT=$VITE_OPTIN_DEV_JWT     VITE_AGENDA_API_BASE_URL=$VITE_AGENDA_API_BASE_URL     VITE_AGENDA_DEV_JWT=$VITE_AGENDA_DEV_JWT
 RUN pnpm build
 
 # Production stage - serve with nginx

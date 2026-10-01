@@ -14,3 +14,10 @@ __pycache__
 *.pyc
 # Excluir CSV da pasta massa, mas manter os de public/ (usados pela app)
 massa/*.csv
+
+# artefatos locais que nao entram no build
+nul
+.npm-cache
+.claude
+.bolt
+.superpowers

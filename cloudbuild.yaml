@@ -1,0 +1,24 @@
+# Build da imagem do ap-front no projeto brikz-ap. Uso:
+#   set -a; . ./.env; set +a
+#   gcloud builds submit . --project brikz-ap --region southamerica-east1 --config cloudbuild.yaml \n#     --substitutions=_TAG=<tag>,_CONTRATOS_URL=$VITE_CONTRATOS_API_BASE_URL,_CONTRATOS_JWT=$VITE_CONTRATOS_DEV_JWT,_FINANCIADOR_ID=$VITE_FINANCIADOR_ID,_OPTIN_URL=$VITE_OPTIN_API_BASE_URL,_OPTIN_JWT=$VITE_OPTIN_DEV_JWT,_AGENDA_URL=$VITE_AGENDA_API_BASE_URL,_AGENDA_JWT=$VITE_AGENDA_DEV_JWT
+#   gcloud run deploy ap-front --project brikz-ap --region southamerica-east1 --image southamerica-east1-docker.pkg.dev/brikz-ap/front/ap-front:<tag> --service-account front-run@brikz-ap.iam.gserviceaccount.com --port 8080 --allow-unauthenticated
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/front/ap-front:$_TAG
+      - --build-arg=VITE_CONTRATOS_API_BASE_URL=$_CONTRATOS_URL
+      - --build-arg=VITE_CONTRATOS_DEV_JWT=$_CONTRATOS_JWT
+      - --build-arg=VITE_FINANCIADOR_ID=$_FINANCIADOR_ID
+      - --build-arg=VITE_OPTIN_API_BASE_URL=$_OPTIN_URL
+      - --build-arg=VITE_OPTIN_DEV_JWT=$_OPTIN_JWT
+      - --build-arg=VITE_AGENDA_API_BASE_URL=$_AGENDA_URL
+      - --build-arg=VITE_AGENDA_DEV_JWT=$_AGENDA_JWT
+      - .
+images:
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/front/ap-front:$_TAG
+serviceAccount: projects/brikz-ap/serviceAccounts/front-build@brikz-ap.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY

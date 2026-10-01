@@ -16,3 +16,10 @@ __pycache__
 *.csv
 # Incluir CSVs da pasta public (necessários para a app)
 !public/*.csv
+
+# artefatos locais que nao entram no build
+nul
+.npm-cache
+.claude
+.bolt
+.superpowers
