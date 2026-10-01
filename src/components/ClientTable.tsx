@@ -1,5 +1,6 @@
 ﻿import React, { useState, useMemo } from 'react';
 import { Client } from '../types';
+import { StatusPill, type StatusTone } from './ui';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown, X, Users } from 'lucide-react';
 
 interface ClientTableProps {
@@ -44,12 +45,12 @@ export const ClientTable: React.FC<ClientTableProps> = ({
     return ((value / total) * 100).toFixed(1).replace('.', ',');
   };
 
-  const getStatusColor = (status: Client['status']) => {
+  const getStatusTone = (status: Client['status']): StatusTone => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'ready';
+      case 'pending': return 'warning';
+      case 'inactive': return 'idle';
+      default: return 'idle';
     }
   };
 
@@ -76,8 +77,8 @@ export const ClientTable: React.FC<ClientTableProps> = ({
       return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
     }
     return sortDirection === 'asc' 
-      ? <ArrowUp className="w-4 h-4 text-blue-600" />
-      : <ArrowDown className="w-4 h-4 text-blue-600" />;
+      ? <ArrowUp className="w-4 h-4 text-cyan-700" />
+      : <ArrowDown className="w-4 h-4 text-cyan-700" />;
   };
 
   const clearSearch = () => {
@@ -126,18 +127,18 @@ export const ClientTable: React.FC<ClientTableProps> = ({
   return (
     <div className="space-y-6">
       {/* Filter Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="panel p-5">
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Buscar por Nome ou Documento</label>
+            <label className="label-mono block mb-2">Buscar por Nome ou Documento</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Digite o nome ou CNPJ do cliente..."
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-soft w-full pl-9 pr-8"
               />
               {filters.search && (
                 <button
@@ -149,67 +150,67 @@ export const ClientTable: React.FC<ClientTableProps> = ({
               )}
             </div>
           </div>
-          <div className="text-sm text-gray-500 pb-2.5 whitespace-nowrap">
+          <div className="font-mono text-xs text-gray-500 pb-2.5 whitespace-nowrap">
             {filteredAndSortedClients.length} de {clients.length} clientes
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="panel overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
+          <table className="table-brikz">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('name')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Cliente</span>
                     {getSortIcon('name')}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('document')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Documento</span>
                     {getSortIcon('document')}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('status')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Status</span>
                     {getSortIcon('status')}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('totalLimit')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Limite Total</span>
                     {getSortIcon('totalLimit')}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('usedLimit')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Utilizado</span>
                     {getSortIcon('usedLimit')}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th>
                   <button
                     onClick={() => handleSort('collateralValue')}
-                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                    className="flex items-center space-x-1 uppercase hover:text-gray-900 transition-colors"
                   >
                     <span>Garantia</span>
                     {getSortIcon('collateralValue')}
@@ -217,17 +218,17 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {filteredAndSortedClients.map((client) => (
                 <tr
                   key={client.id}
-                  className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => onClientClick(client)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
+                      <div className="flex-shrink-0 h-10 w-10 bg-gray-900 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-mono font-semibold text-xs">
                           {client.name.substring(0, 2).toUpperCase()}
                         </span>
                       </div>
@@ -237,38 +238,38 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="whitespace-nowrap font-mono text-gray-900">
                     {client.document}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(client.status)}`}>
+                  <td className="whitespace-nowrap">
+                    <StatusPill tone={getStatusTone(client.status)}>
                       {getStatusLabel(client.status)}
-                    </span>
+                    </StatusPill>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="whitespace-nowrap font-mono text-gray-900">
                     {formatCurrency(client.totalLimit)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="text-sm text-gray-900">
+                      <div className="font-mono text-gray-900">
                         {formatCurrency(client.usedLimit)}
                       </div>
-                      <div className="ml-2 text-xs text-gray-500">
+                      <div className="ml-2 font-mono text-xs text-gray-500">
                         ({formatPercent(client.usedLimit, client.totalLimit)}%)
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="whitespace-nowrap font-mono text-gray-900">
                     {formatCurrency(client.collateralValue)}
                   </td>
                 </tr>
               ))}
               {showScheduleRequest && (
-                <tr className="bg-blue-50 border-t-2 border-blue-200">
-                  <td colSpan={6} className="px-6 py-3">
+                <tr className="bg-gray-50">
+                  <td colSpan={6}>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-blue-800">Total em garantia</span>
-                      <span className="text-sm font-bold text-blue-900">
+                      <span className="label-mono">Total em garantia</span>
+                      <span className="font-mono text-sm font-semibold text-gray-900">
                         {formatCurrency(
                           filteredAndSortedClients.reduce((sum, client) => sum + client.availableLimit, 0)
                         )}
@@ -283,9 +284,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({
         
         {filteredAndSortedClients.length === 0 && (
           <div className="text-center py-12">
-            <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <div className="text-gray-500 mb-2">Nenhum cliente encontrado</div>
-            <div className="text-sm text-gray-400">
+            <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <div className="text-gray-900 mb-2">Nenhum cliente encontrado</div>
+            <div className="text-sm text-gray-500">
               Tente ajustar os filtros ou termos de busca
             </div>
           </div>

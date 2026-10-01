@@ -17,3 +17,16 @@ for (const f of ['ChargebackMonitoringModule', 'LiquidationProblemModule']) {
     assert.doesNotMatch(src, /bg-emerald-600|text-emerald-600|focus:ring-emerald/, 'sem emerald de acao');
   });
 }
+
+for (const f of ['ClientTable', 'PartnerRegistrationModule']) {
+  test(`telas migradas usam a camada: ${f}`, () => {
+    const src = read(f);
+    assert.match(src, /input-soft/);
+    assert.match(src, /className="panel/);
+    assert.match(src, /btn btn-(primary|soft)|chips|table-brikz/);
+  });
+}
+
+test('ClientTable usa tabela brikz', () => {
+  assert.match(read('ClientTable'), /table-brikz/);
+});
