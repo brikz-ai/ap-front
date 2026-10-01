@@ -21,3 +21,16 @@ test('sidebar expandida mostra o logo brikz', () => {
   assert.match(sidebar, /src="\/brand\/logo-on-light\.png"/);
   assert.match(sidebar, /alt="brikz"/);
 });
+
+test('login tem painel ink com logo on-dark', () => {
+  const login = read('src/components/Login.tsx');
+  assert.match(login, /bg-black/);
+  assert.match(login, /src="\/brand\/logo-on-dark\.png"/);
+  assert.match(login, /src="\/brand\/logo-on-light\.png"/);
+});
+
+test('copy do login segue o DS (sem exclamacao)', () => {
+  const login = read('src/components/Login.tsx');
+  const jsxText = [...login.matchAll(/>([^<>{}]+)</g)].map(m => m[1]).join(' ');
+  assert.doesNotMatch(jsxText, /!/);
+});

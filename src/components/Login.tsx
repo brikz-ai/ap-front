@@ -40,10 +40,27 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 bg-white">
+    <div className="min-h-screen flex bg-white">
+      {/* Painel ink (Brikz DS: band preta, unico acento #00ffff) */}
+      <aside className="hidden md:flex md:w-1/2 lg:w-[45%] bg-black text-white flex-col justify-between p-12">
+        <img src="/brand/logo-on-dark.png" alt="brikz" className="h-9 w-auto self-start" />
+        <div className="space-y-4 max-w-sm">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.25em] text-fg-ink-3">Registros de AP</p>
+          <h2 className="font-display text-4xl font-semibold leading-tight text-white">
+            Recebíveis registrados, travas sob controle<span className="text-accent-bright">.</span>
+          </h2>
+          <p className="text-sm leading-relaxed text-fg-ink-2">
+            Contratos, agendas e liquidações na mesma operação.
+          </p>
+        </div>
+        <p className="text-xs text-fg-ink-3">© 2026 brikz</p>
+      </aside>
+
+      <div className="flex-1 flex items-center justify-center p-4">
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-          <div className="text-center space-y-2">
+        <div className="bg-white rounded-2xl p-8 space-y-6">
+          <img src="/brand/logo-on-light.png" alt="brikz" className="h-8 w-auto md:hidden" />
+          <div className="space-y-2">
             <h1 className="text-3xl font-bold text-gray-900">Bem-vindo</h1>
             <p className="text-gray-600">Entre com suas credenciais para acessar o sistema</p>
           </div>
@@ -152,9 +169,10 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
           </button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>© 2025 Todos os direitos reservados</p>
+        <div className="mt-6 text-center text-sm text-gray-500 md:hidden">
+          <p>© 2026 brikz</p>
         </div>
+      </div>
       </div>
 
       {showForgotPassword && (
@@ -171,7 +189,7 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">E-mail enviado!</h2>
+                <h2 className="text-xl font-bold text-gray-900">E-mail enviado</h2>
                 <p className="text-gray-600 text-sm">
                   Se o e-mail <strong>{forgotEmail}</strong> estiver cadastrado, você receberá
                   as instruções para redefinir sua senha em instantes.
