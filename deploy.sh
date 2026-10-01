@@ -1,63 +1,67 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # ============================================
-# Cloud Run Deploy Script - ap-front
+# Deploy do ap-front no Cloud Run (projeto brikz-ap)
+#
+# Pré-requisitos:
+#   - gcloud autenticado com acesso ao projeto (gcloud auth login)
+#   - .env na raiz com as VITE_* (URLs dos backends, FINANCIADOR_ID e JWTs).
+#     As VITE_* são embutidas no bundle público no build.
+#
+# Infra já existente no projeto:
+#   - Artifact Registry: southamerica-east1/front
+#   - Service accounts: front-build (Cloud Build) e front-run (runtime)
+#   - CORS dos backends já libera as URLs do serviço ap-front
 # ============================================
 
-# Configuration - override with env vars or edit here
-PROJECT_ID="${GCP_PROJECT:-registradora-506000}"
+PROJECT_ID="${GCP_PROJECT:-brikz-ap}"
+REGION="${REGION:-southamerica-east1}"
 SERVICE_NAME="${SERVICE_NAME:-ap-front}"
-REGION="${REGION:-us-central1}"
-REPOSITORY_NAME="${REPOSITORY_NAME:-ap-front}"
-IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY_NAME}/${SERVICE_NAME}"
+IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT_ID}/front/${SERVICE_NAME}"
+TAG="${TAG:-$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M)}"
 
-echo "============================================"
-echo "Deploying to Cloud Run"
-echo "  Project:  ${PROJECT_ID}"
-echo "  Service:  ${SERVICE_NAME}"
-echo "  Region:  ${REGION}"
-echo "  Image:   ${IMAGE_NAME}"
-echo "============================================"
+cd "$(dirname "$0")"
 
-# Check gcloud is configured
-if ! gcloud config get-value project &>/dev/null; then
-  echo "Error: gcloud not configured. Run 'gcloud auth login' and 'gcloud config set project PROJECT_ID'"
+if [ ! -f .env ]; then
+  echo "Erro: .env não encontrado na raiz (veja .env.example)." >&2
   exit 1
 fi
 
-# Ensure correct project
-gcloud config set project "${PROJECT_ID}"
+set -a
+# shellcheck disable=SC1091
+. ./.env
+set +a
 
-# Enable required APIs (idempotent)
-echo "Enabling required APIs..."
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com --quiet
+for v in VITE_CONTRATOS_API_BASE_URL VITE_OPTIN_API_BASE_URL VITE_AGENDA_API_BASE_URL VITE_FINANCIADOR_ID; do
+  if [ -z "${!v:-}" ]; then
+    echo "Erro: $v vazia no .env." >&2
+    exit 1
+  fi
+done
 
-# Ensure Artifact Registry repository exists
-if ! gcloud artifacts repositories describe "${REPOSITORY_NAME}" --location="${REGION}" &>/dev/null; then
-  echo "Creating Artifact Registry repository..."
-  gcloud artifacts repositories create "${REPOSITORY_NAME}" \
-    --repository-format=docker \
-    --location="${REGION}" \
-    --description="Container images for ${SERVICE_NAME}"
-fi
+echo "============================================"
+echo "  Projeto: ${PROJECT_ID}"
+echo "  Serviço: ${SERVICE_NAME} (${REGION})"
+echo "  Imagem:  ${IMAGE_BASE}:${TAG}"
+echo "============================================"
 
-# Build and push image using Cloud Build
-echo "Building and pushing image..."
-gcloud builds submit --tag "${IMAGE_NAME}" .
-
-# Deploy to Cloud Run
-echo "Deploying to Cloud Run..."
-gcloud run deploy "${SERVICE_NAME}" \
-  --image "${IMAGE_NAME}" \
+echo "Build da imagem (Cloud Build)..."
+gcloud builds submit . \
+  --project "${PROJECT_ID}" \
   --region "${REGION}" \
-  --platform managed \
+  --config cloudbuild.yaml \
+  --substitutions="_TAG=${TAG},_CONTRATOS_URL=${VITE_CONTRATOS_API_BASE_URL},_CONTRATOS_JWT=${VITE_CONTRATOS_DEV_JWT:-},_FINANCIADOR_ID=${VITE_FINANCIADOR_ID},_OPTIN_URL=${VITE_OPTIN_API_BASE_URL},_OPTIN_JWT=${VITE_OPTIN_DEV_JWT:-},_AGENDA_URL=${VITE_AGENDA_API_BASE_URL},_AGENDA_JWT=${VITE_AGENDA_DEV_JWT:-}"
+
+echo "Deploy no Cloud Run..."
+gcloud run deploy "${SERVICE_NAME}" \
+  --project "${PROJECT_ID}" \
+  --region "${REGION}" \
+  --image "${IMAGE_BASE}:${TAG}" \
+  --service-account "front-run@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --port 8080 \
   --allow-unauthenticated \
-  --port 8080
+  --quiet
 
 echo ""
-echo "============================================"
-echo "Deploy completed successfully!"
-echo ""
-gcloud run services describe "${SERVICE_NAME}" --region "${REGION}" --format="value(status.url)"
-echo "============================================"
+gcloud run services describe "${SERVICE_NAME}" --project "${PROJECT_ID}" --region "${REGION}" --format="value(status.url)"
