@@ -28,3 +28,15 @@ const SECTION_GROUPS: Record<string, string> = {
 export function getSectionGroup(section: string): string {
   return SECTION_GROUPS[section] ?? 'Operação';
 }
+
+// Telas de detalhe com cabecalho proprio (botao voltar): o PageHeader global nao e renderizado.
+const SECTIONS_WITH_OWN_HEADER = new Set<string>([
+  'client-detail',
+  'client-detail-test',
+  'client-radar',
+  'contract-detail',
+]);
+
+export function hasOwnHeader(section: string): boolean {
+  return SECTIONS_WITH_OWN_HEADER.has(section);
+}

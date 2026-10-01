@@ -115,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({ onLogout, sidebarCollapsed, page
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-600 ring-2 ring-white" />
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-600 ring-2 ring-white" aria-hidden="true" />
               )}
             </button>
 
@@ -148,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({ onLogout, sidebarCollapsed, page
                         <div
                           key={notification.id}
                           className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${
-                            !notification.read ? 'bg-blue-50/30' : ''
+                            !notification.read ? 'bg-cyan-50/60' : ''
                           }`}
                           onClick={() => {
                             setNotifications(prev =>

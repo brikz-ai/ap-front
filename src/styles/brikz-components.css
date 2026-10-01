@@ -52,6 +52,7 @@
     cursor: pointer; border: 0; background: transparent; transition: color .2s var(--ease-out);
   }
   .chip:hover { color: var(--ink-1); }
+  .chip:focus-visible { outline: 2px solid var(--cyan-700); outline-offset: 2px; }
   .chip-on { background-color: var(--white); color: var(--cyan-700); box-shadow: var(--shadow-card); font-weight: 600; }
 
   /* ---------- campos ---------- */

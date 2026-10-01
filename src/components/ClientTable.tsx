@@ -77,8 +77,8 @@ export const ClientTable: React.FC<ClientTableProps> = ({
       return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
     }
     return sortDirection === 'asc' 
-      ? <ArrowUp className="w-4 h-4 text-cyan-700" />
-      : <ArrowDown className="w-4 h-4 text-cyan-700" />;
+      ? <ArrowUp className="w-4 h-4 text-cyan-600" />
+      : <ArrowDown className="w-4 h-4 text-cyan-600" />;
   };
 
   const clearSearch = () => {

@@ -1599,9 +1599,9 @@ export const FinancialModule: React.FC = () => {
               </div>
 
               {limitFormTotal && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-                  <p className="text-xs text-emerald-700 font-medium">Limite disponível resultante</p>
-                  <p className="text-lg font-bold text-emerald-800">
+                <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+                  <p className="text-xs text-green-700 font-medium">Limite disponível resultante</p>
+                  <p className="text-lg font-bold text-green-800">
                     {formatBRL(Math.max(parseCurrency(limitFormTotal) - parseCurrency(limitFormUsed), 0))}
                   </p>
                 </div>

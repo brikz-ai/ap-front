@@ -275,7 +275,7 @@ export const OwnershipTransferJourney: React.FC<OwnershipTransferJourneyProps> =
                   <div
                     className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
                       isReady
-                        ? 'bg-purple-50 border-purple-200'
+                        ? 'bg-cyan-50 border-cyan-500'
                         : hasOptIn || hasConsent
                         ? 'bg-yellow-50 border-yellow-200'
                         : 'bg-gray-50 border-gray-200'

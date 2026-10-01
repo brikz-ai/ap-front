@@ -60,11 +60,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
     }`;
 
-  const expandBtnClass = (active: boolean) =>
+  const expandBtnClass = (active: boolean, expanded: boolean) =>
     `w-full flex items-center justify-between px-3 py-2 rounded-md text-left transition-colors text-[13.5px] ${
-      active
+      active && !expanded
         ? "relative bg-gray-100 text-gray-900 font-medium before:content-[''] before:absolute before:-left-3 before:top-2 before:bottom-2 before:w-0.5 before:rounded before:bg-cyan-600"
-        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+        : active
+          ? 'text-gray-900 font-medium hover:bg-gray-50'
+          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
     }`;
 
   const monitoringSubItems = [
@@ -206,7 +208,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
       <div key={key}>
         <button
           onClick={() => setExpanded(!expanded)}
-          className={expandBtnClass(isAnyActive)}
+          className={expandBtnClass(isAnyActive, expanded)}
           aria-expanded={expanded}
         >
           <div className="flex items-center">
@@ -276,7 +278,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-4 pt-6">
           {/* PRINCIPAL section */}
-          <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Principal</p>
+          <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">Principal</p>
 
           <div className="space-y-1">
             {renderSimple('partner-registration', UserPlus, 'Cadastro')}
@@ -287,7 +289,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
           {/* ACOMPANHAMENTO section — oculta temporariamente */}
           {SHOW_ACOMPANHAMENTO && (
             <>
-              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Acompanhamento</p>
+              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">Acompanhamento</p>
               <div className="space-y-1">
                 {renderExpandable('monitoring-group', BarChart3, 'Monitoramento', monitoringExpanded, setMonitoringExpanded, monitoringSubItems)}
                 {renderExpandable('reports-group', FileText, 'Relatórios', reportsExpanded, setReportsExpanded, reportsSubItems)}
@@ -299,7 +301,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
           {/* CONFIGURACOES section (inclui Gestão de acessos) — oculta temporariamente */}
           {SHOW_CONFIGURACOES && (
             <>
-              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">Configurações</p>
+              <p className="px-3 mb-2 mt-5 first:mt-0 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">Configurações</p>
               <div className="space-y-1">
                 {renderExpandable('config-group', Settings, 'Geral', configExpanded, setConfigExpanded, configSubItems)}
                 {renderExpandable('access-management-group', Shield, 'Gestão de acessos', accessManagementExpanded, setAccessManagementExpanded, accessManagementSubItems)}

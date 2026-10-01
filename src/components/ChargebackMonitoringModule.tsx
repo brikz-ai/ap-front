@@ -184,10 +184,11 @@ export const ChargebackMonitoringModule: React.FC = () => {
           <button
             type="button"
             onClick={() => setChartExpanded((e) => !e)}
-            className="panel-head w-full text-left hover:bg-gray-50 transition-colors"
+            className={`panel-head w-full text-left hover:bg-gray-50 transition-colors${chartExpanded ? '' : ' border-b-0'}`}
+            aria-expanded={chartExpanded}
           >
             <BarChart3 className="w-4 h-4 text-gray-400" />
-            <h2 className="panel-title">Valor de chargeback por dia</h2>
+            <span className="panel-title">Valor de chargeback por dia</span>
             <span className="panel-meta">
               {chartData[0].date} – {chartData[chartData.length - 1].date}
             </span>
@@ -250,6 +251,7 @@ export const ChargebackMonitoringModule: React.FC = () => {
                     layout="vertical"
                     iconType="square"
                     wrapperStyle={{ fontSize: 12 }}
+                    formatter={(v) => <span style={{ color: CHART_AXIS.legend }}>{v}</span>}
                   />
                   {chartAcquirers.map((acquirer) => (
                     <Bar
@@ -356,7 +358,7 @@ export const ChargebackMonitoringModule: React.FC = () => {
                       {formatCurrency(r.encumberedValue)}
                     </td>
                     <td className="text-right">
-                      <span className="font-mono font-semibold text-red-500">
+                      <span className="font-mono font-semibold text-red-600">
                         -{formatCurrency(reduction)}
                       </span>
                     </td>

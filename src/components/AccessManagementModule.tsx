@@ -104,7 +104,7 @@ const mockLogs = [
 
 const StatusBadge: React.FC<{ status: 'active' | 'inactive' | 'pending' }> = ({ status }) => {
   const config = {
-    active: { label: 'Ativo', style: 'bg-emerald-100 text-emerald-800', icon: CheckCircle },
+    active: { label: 'Ativo', style: 'bg-green-100 text-green-800', icon: CheckCircle },
     inactive: { label: 'Inativo', style: 'bg-gray-100 text-gray-600', icon: XCircle },
     pending: { label: 'Pendente', style: 'bg-yellow-100 text-yellow-800', icon: Clock },
   }[status];
@@ -400,7 +400,7 @@ export const AccessManagementModule: React.FC<AccessManagementModuleProps> = ({ 
               key={tab.id}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-emerald-50 text-emerald-700'
+                  ? 'bg-cyan-50 text-cyan-700'
                   : 'text-gray-500'
               }`}
             >

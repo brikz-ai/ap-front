@@ -443,7 +443,7 @@ export const PreContractedAntecipationJourney: React.FC<PreContractedAntecipatio
                     disabled={!hasAllAuthorizations}
                     className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all ${
                       hasAllAuthorizations
-                        ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+                        ? 'bg-cyan-50 border-cyan-500 hover:bg-cyan-50'
                         : 'bg-gray-50 border-gray-200 cursor-not-allowed opacity-60'
                     }`}
                   >

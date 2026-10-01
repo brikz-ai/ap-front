@@ -269,7 +269,7 @@ export const CreditRecoveryJourney: React.FC<CreditRecoveryJourneyProps> = ({ is
                   <div
                     className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
                       isReady
-                        ? 'bg-blue-50 border-blue-200'
+                        ? 'bg-cyan-50 border-cyan-500'
                         : hasOptIn || hasConsent
                         ? 'bg-yellow-50 border-yellow-200'
                         : 'bg-gray-50 border-gray-200'

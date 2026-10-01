@@ -16,6 +16,7 @@ test('semanticas batem com as escalas brikz', () => {
   assert.equal(CHART_SEMANTIC.neutral, scales.ink['400']);
   assert.equal(CHART_AXIS.grid, scales.ink['200']);
   assert.equal(CHART_AXIS.tick, scales.ink['400']);
+  assert.equal(CHART_AXIS.legend, scales.ink['600']);
 });
 
 test('getAcquirerColor: adquirentes conhecidas tem cores distintas', () => {

@@ -12,6 +12,7 @@ export const CHART_SEMANTIC = {
 export const CHART_AXIS = {
   grid: '#e5e7eb',
   tick: '#a3a3a3',
+  legend: '#525252',
 };
 
 // Chaves normalizadas (minusculas, sem espacos/pontuacao). Casamento por `includes`.

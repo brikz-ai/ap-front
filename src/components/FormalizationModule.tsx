@@ -248,7 +248,7 @@ export const FormalizationModule: React.FC<FormalizationModuleProps> = ({ client
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center justify-center space-x-2 px-4 rounded-lg border transition-colors h-8 text-sm font-normal ${
                 showFilters || hasActiveFilters
-                  ? 'bg-blue-50 border-blue-300 text-blue-700'
+                  ? 'bg-cyan-50 border-cyan-500 text-blue-700'
                   : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >

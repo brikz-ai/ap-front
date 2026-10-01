@@ -151,7 +151,7 @@ export const NonAcceptanceCriteriaModal: React.FC<NonAcceptanceCriteriaModalProp
           )}
 
           {/* Prazo */}
-          <div className={`rounded-xl border-2 transition-all ${criteria.termEnabled ? 'border-blue-300 bg-blue-50/30' : 'border-gray-200'}`}>
+          <div className={`rounded-xl border-2 transition-all ${criteria.termEnabled ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200'}`}>
             <label className="flex items-center justify-between p-4 cursor-pointer">
               <div className="flex items-center space-x-3">
                 <div className={`p-2 rounded-lg ${criteria.termEnabled ? 'bg-blue-100' : 'bg-gray-100'}`}>

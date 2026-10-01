@@ -234,7 +234,7 @@ export const PartnerRegistrationModule: React.FC = () => {
         {activeTab === 'clients' && (
           <button
             onClick={handleNewPartner}
-            className="btn btn-primary flex items-center space-x-2"
+            className="btn btn-primary"
           >
             <Plus className="w-4 h-4" />
             <span>Novo Cliente</span>

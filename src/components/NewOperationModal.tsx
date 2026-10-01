@@ -196,7 +196,7 @@ export const NewOperationModal: React.FC<NewOperationModalProps> = ({
                       key={type.id}
                       className={`flex items-center space-x-3 p-4 rounded-lg cursor-pointer transition-all border-2 ${
                         formData.operationType === type.id
-                          ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+                          ? 'bg-cyan-50 border-cyan-500 hover:bg-cyan-50'
                           : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                       }`}
                     >

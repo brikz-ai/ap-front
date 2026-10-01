@@ -885,13 +885,13 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
               </div>
             </div>
 
-            <div className="bg-emerald-50 rounded-lg p-4">
+            <div className="bg-green-50 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-emerald-600">Constituídas</p>
-                  <p className="text-2xl font-bold text-emerald-900">{stats.constituidas}</p>
+                  <p className="text-sm font-medium text-green-600">Constituídas</p>
+                  <p className="text-2xl font-bold text-green-900">{stats.constituidas}</p>
                 </div>
-                <CheckCircle className="w-8 h-8 text-emerald-600" />
+                <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
             </div>
 
@@ -925,7 +925,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center justify-center space-x-2 px-4 rounded-lg border transition-colors h-8 text-sm font-normal ${
                   showFilters || hasActiveFilters
-                    ? 'bg-blue-50 border-blue-300 text-blue-700'
+                    ? 'bg-cyan-50 border-cyan-500 text-blue-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >

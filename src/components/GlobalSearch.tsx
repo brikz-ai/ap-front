@@ -245,7 +245,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         onClick={result.onClick}
         onMouseEnter={() => setSelectedIndex(index)}
         className={`w-full flex items-center px-4 py-2.5 hover:bg-gray-50 transition-colors ${
-          index === selectedIndex ? 'bg-blue-50' : ''
+          index === selectedIndex ? 'bg-cyan-50' : ''
         }`}
       >
         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">

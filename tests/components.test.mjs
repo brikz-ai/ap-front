@@ -41,3 +41,13 @@ test('index.css importa a camada', () => {
   const index = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8');
   assert.match(index, /@import ['"]\.\/styles\/brikz-components\.css['"]/);
 });
+
+test('content real do config nao purga classes dinamicas (status-*)', async () => {
+  const { css: real } = await postcss([tailwind(config)]).process(
+    `@tailwind components;\n${readFileSync(new URL('../src/styles/brikz-components.css', import.meta.url), 'utf8')}`,
+    { from: undefined },
+  );
+  for (const c of ['status-ready', 'status-idle', 'status-warning', 'btn-primary', 'chip-on', 'table-brikz']) {
+    assert.match(real, new RegExp(`\\.${c}[\\s{:,.]`), `.${c} purgado com o content real`);
+  }
+});

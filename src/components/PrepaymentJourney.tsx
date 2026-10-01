@@ -422,7 +422,7 @@ export const PrepaymentJourney: React.FC<PrepaymentJourneyProps> = ({ isOpen, on
                       hasContract
                         ? 'bg-green-50 border-green-200 hover:bg-green-100'
                         : hasAllAuthorizations
-                        ? 'bg-teal-50 border-teal-200 hover:bg-teal-100'
+                        ? 'bg-cyan-50 border-cyan-500 hover:bg-cyan-50'
                         : 'bg-gray-50 border-gray-200 cursor-not-allowed opacity-60'
                     }`}
                   >

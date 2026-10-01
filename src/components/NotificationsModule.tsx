@@ -472,7 +472,7 @@ export const NotificationsModule: React.FC = () => {
                   key={user.id} 
                   className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all ${
                     settings[type].users.includes(user.id)
-                      ? 'bg-blue-50 border-2 border-blue-200 hover:bg-blue-100'
+                      ? 'bg-cyan-50 border-2 border-cyan-500 hover:bg-cyan-50'
                       : 'bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                 >
