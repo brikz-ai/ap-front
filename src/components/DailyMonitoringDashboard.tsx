@@ -125,7 +125,7 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
 
           {/* todos */}
           <button onClick={clearAll}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!hasFilters ? 'bg-[#0e4d64] text-white border-[#0e4d64]' : 'text-gray-500 border-gray-200 hover:border-gray-300 bg-white'}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!hasFilters ? 'bg-blue-700 text-white border-blue-700' : 'text-gray-500 border-gray-200 hover:border-gray-300 bg-white'}`}
           >
             Todos ({contractMonitoring.length})
           </button>
@@ -139,7 +139,7 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
             { value: 'no_generation', label: 'Crítico', dot: 'bg-red-500' },
           ] as const).map(s => (
             <button key={s.value} onClick={() => setStatusFilter(statusFilter === s.value ? 'all' : s.value)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${statusFilter === s.value ? 'bg-[#0e4d64] text-white border-[#0e4d64]' : 'text-gray-500 border-gray-200 hover:border-gray-300 bg-white'}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${statusFilter === s.value ? 'bg-blue-700 text-white border-blue-700' : 'text-gray-500 border-gray-200 hover:border-gray-300 bg-white'}`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${statusFilter === s.value ? 'bg-white' : s.dot}`} />
               {s.label}
@@ -155,7 +155,7 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
               value={clientSearch}
               onChange={e => { setClientSearch(e.target.value); setShowDrop(true); }}
               onFocus={() => setShowDrop(true)}
-              className={`pl-8 pr-7 py-1.5 rounded-full text-xs w-52 border transition-colors focus:ring-1 focus:ring-[#137a8b]/40 focus:border-[#137a8b] ${clientSearch ? 'border-[#137a8b] bg-[#137a8b]/5' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
+              className={`pl-8 pr-7 py-1.5 rounded-full text-xs w-52 border transition-colors focus:ring-1 focus:ring-blue-600/40 focus:border-blue-600 ${clientSearch ? 'border-blue-600 bg-blue-600/5' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
             />
             {clientSearch && <button onClick={() => { setClientSearch(''); setShowDrop(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X className="w-3 h-3" /></button>}
             {showDrop && filteredClients.length > 0 && (
@@ -175,7 +175,7 @@ export const DailyMonitoringDashboard: React.FC<DailyMonitoringDashboardProps> =
           {/* ordenar */}
           <div className="relative">
             <select value={sortBy} onChange={e => setSortBy(e.target.value as SortOption)}
-              className="pl-3 pr-7 py-1.5 rounded-full text-xs appearance-none cursor-pointer border border-gray-200 bg-gray-50 transition-colors focus:ring-1 focus:ring-[#137a8b]/40 focus:border-[#137a8b]"
+              className="pl-3 pr-7 py-1.5 rounded-full text-xs appearance-none cursor-pointer border border-gray-200 bg-gray-50 transition-colors focus:ring-1 focus:ring-blue-600/40 focus:border-blue-600"
             >
               <option value="faltam">Maior problema</option>
               <option value="criticality">Mais críticos</option>

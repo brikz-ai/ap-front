@@ -1,6 +1,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type TooltipProps } from 'recharts';
 import { Calendar } from 'lucide-react';
+import { CHART_AXIS, CHART_SEMANTIC } from '../styles/chartColors';
 
 interface ReceivablesFlowChartProps {
   data: {
@@ -130,14 +131,14 @@ export const ReceivablesFlowChart: React.FC<ReceivablesFlowChartProps> = ({ data
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_AXIS.grid} />
           <XAxis
             dataKey="date"
-            stroke="#94a3b8"
+            stroke={CHART_AXIS.tick}
             style={{ fontSize: '12px' }}
           />
           <YAxis
-            stroke="#94a3b8"
+            stroke={CHART_AXIS.tick}
             style={{ fontSize: '12px' }}
             tickFormatter={(value) => formatCurrency(value)}
           />
@@ -149,7 +150,7 @@ export const ReceivablesFlowChart: React.FC<ReceivablesFlowChartProps> = ({ data
           <Line
             type="monotone"
             dataKey="Valor Solicitado"
-            stroke="#3b82f6"
+            stroke={CHART_SEMANTIC.accent}
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={false}
@@ -157,9 +158,9 @@ export const ReceivablesFlowChart: React.FC<ReceivablesFlowChartProps> = ({ data
           <Line
             type="monotone"
             dataKey="Valor Alcançado"
-            stroke="#22c55e"
+            stroke={CHART_SEMANTIC.success}
             strokeWidth={3}
-            dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
+            dot={{ fill: CHART_SEMANTIC.success, strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6 }}
           />
         </LineChart>

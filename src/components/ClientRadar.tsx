@@ -3,6 +3,7 @@ import { Client } from '../types';
 import { ArrowLeft, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { NewContractModal } from './NewContractModal';
 import { ReceivablesIndicator } from './ReceivablesIndicator';
+import { CHART_AXIS, CHART_SEMANTIC } from '../styles/chartColors';
 
 interface ClientRadarProps {
   client: Client;
@@ -521,7 +522,7 @@ export const ClientRadar: React.FC<ClientRadarProps> = ({ client, onBack }) => {
             className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: '#9ca3af #e5e7eb'
+              scrollbarColor: `${CHART_AXIS.tick} ${CHART_AXIS.grid}`
             }}
           >
             <div className="relative" style={{ width: `${radarData.length * 24}px`, minWidth: '100%' }}>
@@ -529,8 +530,8 @@ export const ClientRadar: React.FC<ClientRadarProps> = ({ client, onBack }) => {
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
                   <defs>
                     <linearGradient id="averageGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
-                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                      <stop offset="0%" stopColor={CHART_SEMANTIC.accent} stopOpacity="0.2" />
+                      <stop offset="100%" stopColor={CHART_SEMANTIC.accent} stopOpacity="0.05" />
                     </linearGradient>
                   </defs>
                   <polyline
@@ -543,7 +544,7 @@ export const ClientRadar: React.FC<ClientRadarProps> = ({ client, onBack }) => {
                       return `${x},${y}`;
                     }).join(' ')}
                     fill="url(#averageGradient)"
-                    stroke="#10b981"
+                    stroke={CHART_SEMANTIC.accent}
                     strokeWidth="3"
                   />
                   {radarData.map((data, index) => {
@@ -558,7 +559,7 @@ export const ClientRadar: React.FC<ClientRadarProps> = ({ client, onBack }) => {
                           cx={x}
                           cy={y}
                           r="4"
-                          fill="#10b981"
+                          fill={CHART_SEMANTIC.accent}
                           className="transition-all"
                         />
                       </g>

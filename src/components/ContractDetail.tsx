@@ -20,6 +20,7 @@ import { saveContestacao, getContestacaoMotivo, hasContestacao } from '../utils/
 import { UrIdLink } from './UrIdLink';
 import { buildContractMonitoringFromContaCorrente } from '../data/contractMonitoringBuilder';
 import type { ContaCorrenteEntry, ContaCorrenteEvento } from '../types/contaCorrente';
+import { CHART_AXIS, CHART_SEMANTIC, getAcquirerColor } from '../styles/chartColors';
 import {
   ArrowLeft,
   CheckCircle,
@@ -54,22 +55,6 @@ interface ContractDetailProps {
   contract: Contract;
   onBack: () => void;
 }
-
-const ACQUIRER_COLORS: Record<string, string> = {
-  pagseguro: '#eab308',  // amarelo
-  stone: '#22c55e',      // verde
-  getnet: '#f97316',     // laranja
-  rede: '#ef4444',       // vermelho
-  cielo: '#1e3a5f',      // azul escuro
-};
-
-const getAcquirerColor = (name: string) => {
-  const key = name.toLowerCase().trim();
-  for (const [acquirer, color] of Object.entries(ACQUIRER_COLORS)) {
-    if (key.includes(acquirer)) return color;
-  }
-  return '#94a3b8'; // cinza para desconhecidas
-};
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -445,7 +430,7 @@ export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, onBack
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartByAcquirer} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_AXIS.grid} />
                 <XAxis dataKey="acquirer" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))} />
                 <Tooltip
@@ -465,7 +450,7 @@ export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, onBack
                 </Bar>
                 <Bar dataKey="chargeback" name="Chargeback" radius={[2, 2, 0, 0]}>
                   {chartByAcquirer.map((entry, index) => (
-                    <Cell key={index} fill={getAcquirerColor(entry.acquirer)} opacity={0.7} stroke="#ef4444" strokeWidth={1} />
+                    <Cell key={index} fill={getAcquirerColor(entry.acquirer)} opacity={0.7} stroke={CHART_SEMANTIC.danger} strokeWidth={1} />
                   ))}
                 </Bar>
               </BarChart>

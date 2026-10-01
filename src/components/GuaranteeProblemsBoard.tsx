@@ -224,7 +224,7 @@ export const GuaranteeProblemsBoard: React.FC<GuaranteeProblemsBoard> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white" style={{ backgroundColor: '#CC1717' }}>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">
               {problems.length}
             </span>
             <button

@@ -20,18 +20,8 @@ import {
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { UrIdLink } from './UrIdLink';
+import { CHART_AXIS, getAcquirerColor } from '../styles/chartColors';
 import type { LiquidationProblemUr } from '../data/csvLoader';
-
-const ACQUIRER_COLORS: Record<string, string> = {
-  Cielo: '#1e3a5f',
-  Rede: '#ef4444',
-  Getnet: '#f97316',
-  Stone: '#22c55e',
-  PagSeguro: '#eab308',
-  Dock: '#06b6d4',
-  MercadoPago: '#ec4899',
-  default: '#94a3b8',
-};
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', {
@@ -272,15 +262,15 @@ export const LiquidationProblemModule: React.FC = () => {
                     data={chartData}
                     margin={{ top: 10, right: 30, left: 10, bottom: 60 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_AXIS.grid} />
                     <XAxis
                       dataKey="date"
-                      stroke="#94a3b8"
+                      stroke={CHART_AXIS.tick}
                       style={{ fontSize: '12px' }}
                       tick={{ angle: -45, textAnchor: 'end' }}
                     />
                     <YAxis
-                      stroke="#94a3b8"
+                      stroke={CHART_AXIS.tick}
                       style={{ fontSize: '12px' }}
                       tickFormatter={(v) =>
                         v >= 1000 ? `R$ ${(v / 1000).toFixed(0)}k` : `R$ ${v}`
@@ -317,7 +307,7 @@ export const LiquidationProblemModule: React.FC = () => {
                         key={acquirer}
                         dataKey={acquirer}
                         stackId="liquidation"
-                        fill={ACQUIRER_COLORS[acquirer] ?? ACQUIRER_COLORS.default}
+                        fill={getAcquirerColor(acquirer)}
                         radius={[2, 2, 0, 0]}
                       />
                     ))}
