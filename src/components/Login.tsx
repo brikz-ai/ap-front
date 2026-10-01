@@ -43,7 +43,11 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
     <div className="min-h-screen flex bg-white">
       {/* Painel ink (Brikz DS: band preta, unico acento #00ffff) */}
       <aside className="hidden md:flex md:w-1/2 lg:w-[45%] bg-black text-white flex-col justify-between p-12">
-        <img src="/brand/logo-on-dark.png" alt="brikz" className="h-9 w-auto self-start" />
+        <div className="flex items-center gap-3 self-start">
+          <img src="/brand/logo-on-dark.png" alt="brikz" className="h-9 w-auto" />
+          <span className="h-5 w-px bg-white/25" aria-hidden="true" />
+          <span className="font-display text-lg font-semibold tracking-[-0.01em] text-white">Trava-AP</span>
+        </div>
         <div className="space-y-4 max-w-sm">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.25em] text-fg-ink-3">Registros de AP</p>
           <h2 className="font-display text-4xl font-semibold leading-tight text-white">
@@ -59,7 +63,11 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
       <div className="flex-1 flex items-center justify-center p-4">
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white rounded-2xl p-8 space-y-6">
-          <img src="/brand/logo-on-light.png" alt="brikz" className="h-8 w-auto md:hidden" />
+          <div className="flex items-center gap-2.5 md:hidden">
+            <img src="/brand/logo-on-light.png" alt="brikz" className="h-8 w-auto" />
+            <span className="h-4 w-px bg-gray-200" aria-hidden="true" />
+            <span className="font-display text-base font-semibold tracking-[-0.01em] text-gray-900">Trava-AP</span>
+          </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-gray-900">Bem-vindo</h1>
             <p className="text-gray-600">Entre com suas credenciais para acessar o sistema</p>

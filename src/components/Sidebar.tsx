@@ -264,7 +264,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSection, setActiveSectio
       <div className="bg-white border-r border-gray-200 h-screen w-[280px] sm:w-64 fixed left-0 top-0 z-30 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 flex-shrink-0 border-b border-gray-100">
-          <img src="/brand/logo-on-light.png" alt="brikz" className="h-7 w-auto" />
+          <div className="flex items-center gap-2.5 min-w-0">
+            <img src="/brand/logo-on-light.png" alt="brikz" className="h-7 w-auto flex-shrink-0" />
+            <span className="h-4 w-px bg-gray-200" aria-hidden="true" />
+            <span className="font-display text-[15px] font-semibold tracking-[-0.01em] text-gray-900 whitespace-nowrap">Trava-AP</span>
+          </div>
           <button
             onClick={onToggleCollapse}
             className="p-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"

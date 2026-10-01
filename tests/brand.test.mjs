@@ -38,3 +38,8 @@ test('copy do login segue o DS (sem exclamacao)', () => {
   const jsxText = [...login.matchAll(/>([^<>{}]+)</g)].map(m => m[1]).join(' ');
   assert.doesNotMatch(jsxText, /!/);
 });
+
+test('nome do produto Trava-AP ao lado do logo', () => {
+  assert.match(read('src/components/Sidebar.tsx'), />Trava-AP</);
+  assert.match(read('src/components/Login.tsx'), />Trava-AP</);
+});
