@@ -1,3 +1,5 @@
+import { authFetch } from '../auth/auth';
+
 export class ContratosApiError extends Error {
   codigo: string;
   status: number;
@@ -162,22 +164,16 @@ export interface EventoContratoDTO {
 
 const BASE_URL = import.meta.env.VITE_CONTRATOS_API_BASE_URL as string;
 const FINANCIADOR_ID = import.meta.env.VITE_FINANCIADOR_ID as string;
-const DEV_JWT = import.meta.env.VITE_CONTRATOS_DEV_JWT as string;
 
 interface RequestOptions {
   body?: unknown;
 }
 
 async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await authFetch(`${BASE_URL}${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
-      // Só o endpoint de eventos exige JWT hoje (ele devolve request/response
-      // crus da CERC, com dados bancários do domicílio). Enviar em todas as
-      // chamadas mantém o dia em que as demais rotas forem protegidas como
-      // uma mudança só do backend.
-      'Authorization': `Bearer ${DEV_JWT}`,
     },
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
   });

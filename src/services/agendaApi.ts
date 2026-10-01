@@ -1,3 +1,5 @@
+import { authFetch } from '../auth/auth';
+
 export class AgendaApiError extends Error {
   codigo: string;
   status: number;
@@ -48,7 +50,6 @@ export interface ListarUrsResposta {
 }
 
 const BASE_URL = import.meta.env.VITE_AGENDA_API_BASE_URL as string;
-const DEV_JWT = import.meta.env.VITE_AGENDA_DEV_JWT as string;
 
 interface RequestOptions {
   body?: unknown;
@@ -57,10 +58,9 @@ interface RequestOptions {
 async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${DEV_JWT}`,
   };
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await authFetch(`${BASE_URL}${path}`, {
     method,
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,

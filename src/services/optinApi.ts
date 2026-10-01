@@ -1,3 +1,5 @@
+import { authFetch } from '../auth/auth';
+
 export class OptinApiError extends Error {
   codigo: string;
   status: number;
@@ -76,7 +78,6 @@ export interface CriarClientePayload {
 }
 
 const BASE_URL = import.meta.env.VITE_OPTIN_API_BASE_URL as string;
-const DEV_JWT = import.meta.env.VITE_OPTIN_DEV_JWT as string;
 
 interface RequestOptions {
   body?: unknown;
@@ -86,13 +87,12 @@ interface RequestOptions {
 async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${DEV_JWT}`,
   };
   if (options.idempotent) {
     headers['Idempotency-Key'] = crypto.randomUUID();
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await authFetch(`${BASE_URL}${path}`, {
     method,
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
