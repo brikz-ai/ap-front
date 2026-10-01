@@ -16,7 +16,11 @@ set -euo pipefail
 # ============================================
 
 PROJECT_ID="${GCP_PROJECT:-brikz-ap}"
+# Imagem e build ficam em southamerica-east1. O servico roda em duas regioes:
+# southamerica-east1 e us-east1 (esta atende ap.brikz.ai, pois domain mapping
+# do Cloud Run nao e permitido em southamerica-east1).
 REGION="${REGION:-southamerica-east1}"
+DEPLOY_REGIONS="${DEPLOY_REGIONS:-southamerica-east1 us-east1}"
 SERVICE_NAME="${SERVICE_NAME:-ap-front}"
 IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT_ID}/front/${SERVICE_NAME}"
 TAG="${TAG:-$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M)}"
@@ -42,7 +46,7 @@ done
 
 echo "============================================"
 echo "  Projeto: ${PROJECT_ID}"
-echo "  Serviço: ${SERVICE_NAME} (${REGION})"
+echo "  Serviço: ${SERVICE_NAME} (${DEPLOY_REGIONS})"
 echo "  Imagem:  ${IMAGE_BASE}:${TAG}"
 echo "============================================"
 
@@ -53,15 +57,17 @@ gcloud builds submit . \
   --config cloudbuild.yaml \
   --substitutions="_TAG=${TAG},_CONTRATOS_URL=${VITE_CONTRATOS_API_BASE_URL},_CONTRATOS_JWT=${VITE_CONTRATOS_DEV_JWT:-},_FINANCIADOR_ID=${VITE_FINANCIADOR_ID},_OPTIN_URL=${VITE_OPTIN_API_BASE_URL},_OPTIN_JWT=${VITE_OPTIN_DEV_JWT:-},_AGENDA_URL=${VITE_AGENDA_API_BASE_URL},_AGENDA_JWT=${VITE_AGENDA_DEV_JWT:-}"
 
-echo "Deploy no Cloud Run..."
-gcloud run deploy "${SERVICE_NAME}" \
-  --project "${PROJECT_ID}" \
-  --region "${REGION}" \
-  --image "${IMAGE_BASE}:${TAG}" \
-  --service-account "front-run@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --port 8080 \
-  --allow-unauthenticated \
-  --quiet
+for R in ${DEPLOY_REGIONS}; do
+  echo "Deploy no Cloud Run (${R})..."
+  gcloud run deploy "${SERVICE_NAME}" \
+    --project "${PROJECT_ID}" \
+    --region "${R}" \
+    --image "${IMAGE_BASE}:${TAG}" \
+    --service-account "front-run@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --port 8080 \
+    --allow-unauthenticated \
+    --quiet
+done
 
 echo ""
-gcloud run services describe "${SERVICE_NAME}" --project "${PROJECT_ID}" --region "${REGION}" --format="value(status.url)"
+echo "No ar em: https://ap.brikz.ai"
