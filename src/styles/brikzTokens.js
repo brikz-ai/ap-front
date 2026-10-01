@@ -13,6 +13,12 @@ const ink = {
   600: '#525252', 700: '#404040', 800: '#1f1f1f', 900: '#0a0a0a', 950: '#000000',
 };
 
+// Primario de acao do DS: ink-1 (#0a0a0a) na posicao 600, preto puro no hover (700+).
+const primary = {
+  50: '#fafafa', 100: '#f4f4f5', 200: '#e5e7eb', 300: '#d4d4d8', 400: '#a3a3a3', 500: '#525252',
+  600: '#0a0a0a', 700: '#000000', 800: '#000000', 900: '#000000', 950: '#000000',
+};
+
 // --data-3
 const success = {
   50: '#e6f7f2', 100: '#c2ecdf', 200: '#8fdcc5', 300: '#52c8a6', 400: '#1fb68d', 500: '#00a87e',
@@ -31,12 +37,15 @@ const warning = {
   600: '#c96b00', 700: '#a35700', 800: '#7d4300', 900: '#5a3000', 950: '#361d00',
 };
 
-export const scales = { accent, ink, success, danger, warning };
+export const scales = { accent, primary, ink, success, danger, warning };
 
-// O DS tem um unico accent: todo matiz decorativo do Tailwind vira cyan.
+// Platform UI clara: o "azul" do app (e demais matizes de acao) vira o primario preto do DS.
+// O cyan so aparece onde for pedido explicitamente (`cyan-*` / `accent`).
+export const focusPalettes = ['blue', 'sky', 'indigo', 'purple', 'violet', 'fuchsia', 'teal', 'emerald'];
+
 export const paletteMap = {
-  blue: 'accent', sky: 'accent', indigo: 'accent', cyan: 'accent', teal: 'accent', emerald: 'accent',
-  purple: 'accent', violet: 'accent', fuchsia: 'accent',
+  ...Object.fromEntries(focusPalettes.map(p => [p, 'primary'])),
+  cyan: 'accent',
   slate: 'ink', gray: 'ink', zinc: 'ink', neutral: 'ink', stone: 'ink',
   green: 'success', lime: 'success',
   red: 'danger', rose: 'danger', pink: 'danger',

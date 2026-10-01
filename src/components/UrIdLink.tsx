@@ -19,7 +19,7 @@ export const UrIdLink: React.FC<UrIdLinkProps> = ({ urId, className }) => {
           e.stopPropagation();
           setShowModal(true);
         }}
-        className={`font-mono text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded ${className ?? ''}`}
+        className={`font-mono text-sm font-medium text-cyan-600 hover:text-cyan-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded ${className ?? ''}`}
       >
         {urId}
       </button>

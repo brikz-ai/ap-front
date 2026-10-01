@@ -27,10 +27,26 @@ test('todas as paletas default do Tailwind sao brikz', () => {
   }
 });
 
-test('accent do DS na posicao 600 e hover na 700', () => {
-  assert.equal(theme.colors.blue['600'], '#0891b2');
-  assert.equal(theme.colors.blue['700'], '#0e7490');
+test('primario e ink: blue-600 preto, blue-700 #000', () => {
+  assert.equal(theme.colors.blue['600'], '#0a0a0a');
+  assert.equal(theme.colors.blue['700'], '#000000');
+  assert.equal(theme.colors.emerald['600'], '#0a0a0a');
+  assert.equal(theme.colors.purple['50'], '#fafafa');
+});
+
+test('cyan e o accent explicito', () => {
+  assert.equal(theme.colors.cyan['600'], '#0891b2');
+  assert.equal(theme.colors.cyan['700'], '#0e7490');
   assert.equal(theme.colors.accent.DEFAULT, '#0891b2');
+});
+
+test('ring e border de focus continuam cyan', () => {
+  for (const p of ['blue', 'emerald', 'teal', 'indigo', 'purple']) {
+    assert.equal(theme.ringColor[p]['500'], '#06b6d4', `ring ${p}-500`);
+    assert.equal(theme.borderColor[p]['500'], '#06b6d4', `border ${p}-500`);
+    assert.equal(theme.borderColor[p]['600'], '#0891b2', `border ${p}-600`);
+    assert.equal(theme.borderColor[p]['200'], '#e5e7eb', `border ${p}-200 fica hairline`);
+  }
 });
 
 test('cinza e ink brikz', () => {
