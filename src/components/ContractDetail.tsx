@@ -438,17 +438,17 @@ export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, onBack
                   contentStyle={{ fontSize: '12px' }}
                 />
                 <Legend />
-                <Bar dataKey="esperado" name="Esperado" radius={[2, 2, 0, 0]}>
+                <Bar dataKey="esperado" name="Esperado" fill={CHART_SEMANTIC.neutral} radius={[2, 2, 0, 0]}>
                   {chartByAcquirer.map((entry, index) => (
                     <Cell key={index} fill={getAcquirerColor(entry.acquirer)} opacity={0.4} />
                   ))}
                 </Bar>
-                <Bar dataKey="atual" name="Atual" radius={[2, 2, 0, 0]}>
+                <Bar dataKey="atual" name="Atual" fill={CHART_SEMANTIC.accent} radius={[2, 2, 0, 0]}>
                   {chartByAcquirer.map((entry, index) => (
                     <Cell key={index} fill={getAcquirerColor(entry.acquirer)} />
                   ))}
                 </Bar>
-                <Bar dataKey="chargeback" name="Chargeback" radius={[2, 2, 0, 0]}>
+                <Bar dataKey="chargeback" name="Chargeback" fill={CHART_SEMANTIC.danger} radius={[2, 2, 0, 0]}>
                   {chartByAcquirer.map((entry, index) => (
                     <Cell key={index} fill={getAcquirerColor(entry.acquirer)} opacity={0.7} stroke={CHART_SEMANTIC.danger} strokeWidth={1} />
                   ))}

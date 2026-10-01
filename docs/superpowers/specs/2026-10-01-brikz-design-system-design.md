@@ -115,6 +115,7 @@ O config leva um comentário de cabeçalho explicando que nomes como `blue` e `p
 - **Perda de distinção por categoria.** Onde purple, teal ou violet diferenciavam categorias (badges, tipos), elas passam a ter a mesma cor do accent. Mitigação: durante a implementação, listar os arquivos onde isso acontece em `docs/superpowers/specs/2026-10-01-brikz-revisao-categorias.md` para revisão; a correção fica para a fase B.
 - **Nomes enganosos.** `blue` passa a ser cyan, o que fica documentado no config. A fase C elimina isso.
 - **Raios menores** podem mudar a sensação de cards e modais. É intencional, para seguir o DS.
+- **Contraste do accent como texto.** O accent do DS `#0891b2` usado como cor de texto (`text-blue-600`, `text-purple-600`, `text-teal-600`, `text-emerald-600`, ~430 ocorrências) tem contraste 3,68:1 sobre branco (3,54:1 sobre `bg-blue-50`), abaixo do WCAG AA 4,5:1 para texto normal; o mesmo vale para texto branco sobre `bg-blue-600`. Aceito na fase A por ser o valor oficial `--fg-accent` do DS. Para a fase C, avaliar um token `text-accent-strong` com `#0e7490` (5,36:1) para usos de texto.
 
 ## Verificação
 

@@ -39,7 +39,9 @@ Total: 20 linhas de tabela (colisões em 15 arquivos). Os três `getEventoBadge`
 
 ## Observação: semântica de sucesso
 
-`emerald` era usado como "OK/sucesso" em alguns lugares, e agora renderiza cyan (accent), não o verde de `success`. Não é colisão entre categorias, mas o significado verde se perdeu. Locais: `ContractMonitoringCard.tsx:32-36` e `DailyMonitoringDashboard.tsx:101-105,137` (status `functional`), `ContractDetail.tsx:72` e equivalentes (`liquidacao_total`). Na fase B, trocar `emerald` por `green` onde a intenção é sucesso.
+`emerald` era usado como "OK/sucesso" em alguns lugares, e agora renderiza cyan (accent), não o verde de `success`. Não é colisão entre categorias, mas o significado verde se perdeu. Locais: `ContractMonitoringCard.tsx:32` e `:42` (status `functional` e barra `pct >= 100`), `DailyMonitoringDashboard.tsx:101-105,137` (status `functional`), `liquidacao_total` nas três funções `getEventoBadge` (`ContractDetail.tsx:72`, `DisputesModule.tsx:29`, `ReceivablesLedgerModule.tsx:41`) e o papel `emerald` em `AccessManagementModule.tsx:60,235`.
+
+A correção da fase B é **por ponto de uso**: trocar `emerald` por `green` apenas nesses pontos de status, e **NÃO alterar o `paletteMap`**, porque ~35 usos de `emerald` são botões primários, focus rings, abas ativas e o item ativo da Sidebar, que a spec exige em cyan.
 
 ## Como foi levantado
 
