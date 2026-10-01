@@ -91,7 +91,7 @@ test('refresh com 401 limpa a sessao e emite onSessionChange', async () => {
   seed();
   let changes = 0;
   const off = auth.onSessionChange(() => { changes++; });
-  mockFetch((url) => (url.includes('/api/auth/refresh') ? json(401) : json(401)));
+  mockFetch(() => json(401));
   const res = await auth.authFetch('https://api/x');
   off();
   assert.equal(res.status, 401);
@@ -152,4 +152,12 @@ test('nao sobrou DEV_JWT em src/', () => {
   };
   walk('src');
   assert.deepEqual(hits, []);
+});
+
+test('refresh ok mas a repeticao ainda da 401: a sessao e MANTIDA', async () => {
+  seed();
+  mockFetch((url) => (url.includes('/api/auth/refresh') ? json(200, { access: 'new' }) : json(401)));
+  const res = await auth.authFetch('https://api/x');
+  assert.equal(res.status, 401);
+  assert.equal(auth.getSession().access, 'new');
 });

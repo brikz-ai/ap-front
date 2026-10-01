@@ -117,7 +117,7 @@ export async function fetchMe(access?: string): Promise<AuthUser> {
   const res = access
     ? await fetch(url, { headers: { Authorization: `Bearer ${access}` } })
     : await authFetch(url);
-  if (!res.ok) throw new Error(await errorMessage(res, 'Sessao invalida.'));
+  if (!res.ok) throw new Error(await errorMessage(res, 'Sessão inválida.'));
   return (await res.json()) as AuthUser;
 }
 
@@ -129,7 +129,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, return_to: window.location.origin }),
   });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Falha ao solicitar a redefinicao.'));
+  if (!res.ok) throw new Error(await errorMessage(res, 'Falha ao solicitar a redefinição.'));
 }
 
 export async function confirmPasswordReset(uid: string, token: string, password: string): Promise<void> {
@@ -138,7 +138,7 @@ export async function confirmPasswordReset(uid: string, token: string, password:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ uid, token, password }),
   });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Nao foi possivel redefinir a senha.'));
+  if (!res.ok) throw new Error(await errorMessage(res, 'Não foi possível redefinir a senha.'));
 }
 
 export async function changePassword(current: string, next: string): Promise<void> {
@@ -147,7 +147,7 @@ export async function changePassword(current: string, next: string): Promise<voi
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ current_password: current, new_password: next }),
   });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Nao foi possivel alterar a senha.'));
+  if (!res.ok) throw new Error(await errorMessage(res, 'Não foi possível alterar a senha.'));
 }
 
 // --- Google -----------------------------------------------------------------
