@@ -19,8 +19,19 @@ import { PartnerRegistrationModule } from './components/PartnerRegistrationModul
 import { OverviewModule } from './components/OverviewModule';
 import { NewClientModal } from './components/NewClientModal';
 import { ImportClientsModal } from './components/ImportClientsModal';
-import { Login } from './components/Login';
-import { Register } from './components/Register';
+import { LoginScreen } from './components/auth/LoginScreen';
+import { ForgotPasswordScreen } from './components/auth/ForgotPasswordScreen';
+import { ResetPasswordScreen } from './components/auth/ResetPasswordScreen';
+import { ChangePasswordScreen } from './components/auth/ChangePasswordScreen';
+import {
+  clearSession,
+  consumeLoginHash,
+  fetchMe,
+  getSession,
+  onSessionChange,
+  storeSession,
+  type AuthUser,
+} from './auth/auth';
 import { OptInSignature } from './components/OptInSignature';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
@@ -77,13 +88,8 @@ const LazyAccessManagementModule = React.lazy(() =>
   import('./components/AccessManagementModule').then(module => ({ default: module.AccessManagementModule }))
 );
 
-function App() {
+function AppContent({ user }: { user: AuthUser }) {
   const { clients: appClients, contracts: appContractsData, isLoading: _dataLoading, updateClient, retry: reloadClients } = useData();
-  const isSignaturePage = window.location.pathname.startsWith('/optin-signature/');
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-  const [showRegister, setShowRegister] = useState(false);
   const [activeSection, setActiveSection] = useState('partner-registration');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedClientTest, setSelectedClientTest] = useState<Client | null>(null);
@@ -182,45 +188,9 @@ function App() {
     setActiveSection('clients');
   };
 
-  useEffect(() => {
-    localStorage.setItem('isAuthenticated', isAuthenticated.toString());
-  }, [isAuthenticated]);
-
-  const handleLogin = (_email: string, _password: string) => {
-    setIsAuthenticated(true);
-  };
-
-  const handleRegister = (_name: string, _email: string, _password: string) => {
-    setIsAuthenticated(true);
-    setShowRegister(false);
-  };
-
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setShowRegister(false);
-    localStorage.removeItem('isAuthenticated');
+    clearSession();
   };
-
-  if (isSignaturePage) {
-    return <OptInSignature />;
-  }
-
-  if (!isAuthenticated) {
-    if (showRegister) {
-      return (
-        <Register
-          onRegister={handleRegister}
-          onBackToLogin={() => setShowRegister(false)}
-        />
-      );
-    }
-    return (
-      <Login
-        onLogin={handleLogin}
-        onSwitchToRegister={() => setShowRegister(true)}
-      />
-    );
-  }
 
   // Nomes mock de aprovadores para simular usuários distintos
   const mockApprovers = [
@@ -502,6 +472,7 @@ function App() {
           onHelpClick={() => setShowShortcutsModal(true)}
         />
         <Header
+          user={user}
           onLogout={handleLogout}
           sidebarCollapsed={sidebarCollapsed}
           pageTitle={pageTitle}
@@ -587,6 +558,95 @@ function App() {
       <ToastContainer toasts={toasts} onClose={removeToast} />
     </>
   );
+}
+
+// Retorno do Google: o IAM volta para a origem com #access=..&refresh=.. (ou
+// #error=..). Consumido uma unica vez por carga (StrictMode roda efeitos 2x).
+type Boot = { tokens: { access: string; refresh: string } | null; googleError: string | null };
+let bootCache: Boot | null = null;
+let bootMePromise: Promise<void> | null = null;
+
+function readBoot(): Boot {
+  if (bootCache) return bootCache;
+  const tokens = consumeLoginHash();
+  let googleError: string | null = null;
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const queryParams = new URLSearchParams(window.location.search);
+  const err = hashParams.get('error') ?? queryParams.get('error');
+  if (!tokens && err) {
+    googleError =
+      err === 'forbidden' || err === 'access_denied' || err === '403'
+        ? 'Sua conta Google não tem acesso ao Trava-AP. Fale com o administrador.'
+        : 'Não foi possível entrar com o Google. Tente novamente.';
+    window.history.replaceState(null, '', window.location.pathname);
+  }
+  bootCache = { tokens, googleError };
+  return bootCache;
+}
+
+function App() {
+  const isSignaturePage = window.location.pathname.startsWith('/optin-signature/');
+  const [boot] = useState(readBoot);
+  const [session, setSession] = useState(() => getSession());
+  const [bootstrapping, setBootstrapping] = useState(() => !!boot.tokens);
+  const [bootError, setBootError] = useState<string | null>(boot.googleError);
+  const [showForgot, setShowForgot] = useState(false);
+  const [isResetRoute, setIsResetRoute] = useState(() => window.location.pathname === '/reset-password');
+
+  useEffect(() => onSessionChange(() => setSession(getSession())), []);
+
+  useEffect(() => {
+    if (!boot.tokens) return;
+    const { access, refresh } = boot.tokens;
+    if (!bootMePromise) {
+      bootMePromise = fetchMe(access).then((user) => {
+        storeSession({ user, access, refresh });
+      });
+    }
+    let cancelled = false;
+    bootMePromise
+      .catch(() => {
+        if (!cancelled) setBootError('Não foi possível entrar com o Google. Tente novamente.');
+      })
+      .finally(() => {
+        if (!cancelled) setBootstrapping(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [boot]);
+
+  if (isSignaturePage) return <OptInSignature />;
+
+  if (isResetRoute) {
+    const params = new URLSearchParams(window.location.search);
+    return (
+      <ResetPasswordScreen
+        uid={params.get('uid') ?? ''}
+        token={params.get('token') ?? ''}
+        onDone={() => {
+          window.history.replaceState(null, '', '/');
+          setIsResetRoute(false);
+          setShowForgot(false);
+        }}
+      />
+    );
+  }
+
+  if (bootstrapping) {
+    return <LoadingSpinner size="lg" text="Entrando..." fullScreen />;
+  }
+
+  if (!session) {
+    if (showForgot) return <ForgotPasswordScreen onBack={() => setShowForgot(false)} />;
+    return <LoginScreen onForgot={() => setShowForgot(true)} initialError={bootError} />;
+  }
+
+  if (session.user.must_change_password) {
+    return <ChangePasswordScreen user={session.user} />;
+  }
+
+  return <AppContent user={session.user} />;
 }
 
 export default App;

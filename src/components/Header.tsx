@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { AuthUser } from '../auth/auth';
 import { User, LogOut, Settings, Bell, Search, AlertTriangle, CheckCircle, Info, Clock } from 'lucide-react';
 
 interface Notification {
@@ -38,6 +39,7 @@ const initialNotifications: Notification[] = [
 ];
 
 interface HeaderProps {
+  user: AuthUser;
   onLogout: () => void;
   sidebarCollapsed: boolean;
   pageTitle: string;
@@ -46,7 +48,7 @@ interface HeaderProps {
   onSettingsClick?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onLogout, sidebarCollapsed, pageTitle, sectionGroup, onSearchClick, onSettingsClick }) => {
+export const Header: React.FC<HeaderProps> = ({ user, onLogout, sidebarCollapsed, pageTitle, sectionGroup, onSearchClick, onSettingsClick }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
@@ -212,8 +214,8 @@ export const Header: React.FC<HeaderProps> = ({ onLogout, sidebarCollapsed, page
                 <User className="w-5 h-5 text-white" />
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium text-gray-900 leading-tight">Ricardo Lima</p>
-                <p className="text-xs text-gray-500 leading-tight">ricardo.lima@ideen.tech</p>
+                <p className="text-sm font-medium text-gray-900 leading-tight">{user.name}</p>
+                <p className="text-xs text-gray-500 leading-tight">{user.email}</p>
               </div>
             </button>
 
@@ -225,8 +227,8 @@ export const Header: React.FC<HeaderProps> = ({ onLogout, sidebarCollapsed, page
                 />
                 <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">Ricardo Lima</p>
-                    <p className="text-xs text-gray-500">ricardo.lima@ideen.tech</p>
+                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
                   <button
                     onClick={() => {

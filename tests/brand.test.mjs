@@ -27,19 +27,23 @@ test('sidebar expandida mostra o logo brikz', () => {
 });
 
 test('login tem painel ink com logo on-dark', () => {
-  const login = read('src/components/Login.tsx');
-  assert.match(login, /bg-black/);
-  assert.match(login, /src="\/brand\/logo-on-dark\.png"/);
-  assert.match(login, /src="\/brand\/logo-on-light\.png"/);
+  const shell = read('src/components/auth/AuthShell.tsx');
+  assert.match(shell, /bg-black/);
+  assert.match(shell, /src="\/brand\/logo-on-dark\.png"/);
+  assert.match(shell, /src="\/brand\/logo-on-light\.png"/);
 });
 
 test('copy do login segue o DS (sem exclamacao)', () => {
-  const login = read('src/components/Login.tsx');
-  const jsxText = [...login.matchAll(/>([^<>{}]+)</g)].map(m => m[1]).join(' ');
-  assert.doesNotMatch(jsxText, /!/);
+  for (const f of ['AuthShell', 'LoginScreen', 'ForgotPasswordScreen', 'ResetPasswordScreen', 'ChangePasswordScreen']) {
+    const src = read(`src/components/auth/${f}.tsx`);
+    const jsxText = [...src.matchAll(/>([^<>{}]+)</g)].map(m => m[1]).join(' ');
+    assert.doesNotMatch(jsxText, /!/, f);
+    const literals = [...src.matchAll(/'([^'\n]*)'/g)].map(m => m[1]).filter(t => /\s/.test(t)).join(' ');
+    assert.doesNotMatch(literals, /!/, f);
+  }
 });
 
 test('nome do produto Trava-AP ao lado do logo', () => {
   assert.match(read('src/components/Sidebar.tsx'), />Trava-AP</);
-  assert.match(read('src/components/Login.tsx'), />Trava-AP</);
+  assert.match(read('src/components/auth/AuthShell.tsx'), />Trava-AP</);
 });
