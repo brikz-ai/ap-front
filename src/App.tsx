@@ -43,7 +43,7 @@ import {
   mockReceivableReports,
 } from './data/mockData';
 import { Client, Contract } from './types';
-import { useData } from './context/DataContext';
+import { DataProvider, useData } from './context/DataContext';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { PageHeader } from './components/ui';
 import { getSectionGroup, hasOwnHeader } from './navigation/sectionGroups';
@@ -570,18 +570,19 @@ function readBoot(): Boot {
   if (bootCache) return bootCache;
   const tokens = consumeLoginHash();
   let googleError: string | null = null;
+  // Reservado para um futuro redirect de erro do IAM (#error=..). Hoje o
+  // google_callback responde JSON em erro e nao redireciona.
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  const queryParams = new URLSearchParams(window.location.search);
-  const err = hashParams.get('error') ?? queryParams.get('error');
-  if (!tokens && err) {
-    googleError =
-      err === 'forbidden' || err === 'access_denied' || err === '403'
-        ? 'Sua conta Google não tem acesso ao Trava-AP. Fale com o administrador.'
-        : 'Não foi possível entrar com o Google. Tente novamente.';
-    window.history.replaceState(null, '', window.location.pathname);
+  if (!tokens && hashParams.get('error')) {
+    googleError = 'Não foi possível entrar com o Google. Tente novamente.';
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
   }
   bootCache = { tokens, googleError };
   return bootCache;
+}
+
+function isResetPath(p: string): boolean {
+  return p === '/reset-password' || p === '/reset-password/';
 }
 
 function App() {
@@ -591,7 +592,7 @@ function App() {
   const [bootstrapping, setBootstrapping] = useState(() => !!boot.tokens);
   const [bootError, setBootError] = useState<string | null>(boot.googleError);
   const [showForgot, setShowForgot] = useState(false);
-  const [isResetRoute, setIsResetRoute] = useState(() => window.location.pathname === '/reset-password');
+  const [isResetRoute, setIsResetRoute] = useState(() => isResetPath(window.location.pathname));
 
   useEffect(() => onSessionChange(() => setSession(getSession())), []);
 
@@ -646,7 +647,11 @@ function App() {
     return <ChangePasswordScreen user={session.user} />;
   }
 
-  return <AppContent user={session.user} />;
+  return (
+    <DataProvider key={session.user.id}>
+      <AppContent user={session.user} />
+    </DataProvider>
+  );
 }
 
 export default App;

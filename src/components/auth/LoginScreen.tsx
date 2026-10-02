@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { googleStartUrl, login } from '../../auth/auth';
+import { HttpError, googleStartUrl, login } from '../../auth/auth';
 import { AuthShell, ErrorNote, Field, PasswordInput, inputClass, primaryBtnClass } from './AuthShell';
 
 // Login unico com o brikz-iam: Google (SSO) ou e-mail e senha. O login()
@@ -34,7 +34,9 @@ export function LoginScreen({
     } catch (err) {
       setSubmitting(false);
       // fetch rejeita com TypeError sem rede; o IAM responde 400 para credenciais ruins
-      setError(err instanceof TypeError ? 'Não foi possível conectar' : 'E-mail ou senha inválidos');
+      if (err instanceof HttpError && err.status === 400) setError('E-mail ou senha inválidos');
+      else if (err instanceof TypeError) setError('Não foi possível conectar');
+      else setError('Não foi possível entrar. Tente novamente.');
     }
   }
 

@@ -98,13 +98,22 @@ async function errorMessage(res: Response, fallback: string): Promise<string> {
 }
 
 // --- Chamadas ao IAM --------------------------------------------------------
+export class HttpError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+  }
+}
+
 export async function login(email: string, password: string): Promise<Session> {
   const res = await fetch(`${AUTH_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Falha ao entrar.'));
+  if (!res.ok) throw new HttpError(await errorMessage(res, 'Falha ao entrar.'), res.status);
   const session = (await res.json()) as Session;
   storeSession(session);
   return session;

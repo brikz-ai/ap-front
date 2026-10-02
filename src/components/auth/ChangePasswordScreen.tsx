@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { changePassword, fetchMe, getSession, storeSession, type AuthUser } from '../../auth/auth';
+import { changePassword, clearSession, fetchMe, getSession, storeSession, type AuthUser } from '../../auth/auth';
 import { AuthShell, ErrorNote, Field, inputClass, primaryBtnClass } from './AuthShell';
 
 // Troca obrigatoria no primeiro acesso (senha temporaria). O App prende o
@@ -25,16 +25,15 @@ export function ChangePasswordScreen({ user }: { user: AuthUser }) {
     setSubmitting(true);
     try {
       await changePassword(current, next);
-      // storeSession dispara onSessionChange e o App libera o app.
+      // Usa o usuario fresco como veio; storeSession dispara onSessionChange.
+      // Se nao for possivel confirmar, encerra a sessao e volta ao login.
       const session = getSession();
-      if (session) {
-        let fresh: AuthUser;
-        try {
-          fresh = await fetchMe();
-        } catch {
-          fresh = session.user;
-        }
-        storeSession({ ...session, user: { ...fresh, must_change_password: false } });
+      if (!session) return;
+      try {
+        const fresh = await fetchMe();
+        storeSession({ ...session, user: fresh });
+      } catch {
+        clearSession();
       }
     } catch (err) {
       setSubmitting(false);

@@ -161,3 +161,8 @@ test('refresh ok mas a repeticao ainda da 401: a sessao e MANTIDA', async () => 
   assert.equal(res.status, 401);
   assert.equal(auth.getSession().access, 'new');
 });
+
+test('login com erro expoe o status HTTP no erro', async () => {
+  mockFetch(() => json(400, { detail: 'x' }));
+  await assert.rejects(() => auth.login('x', 'y'), (e) => e.status === 400 && e instanceof auth.HttpError);
+});

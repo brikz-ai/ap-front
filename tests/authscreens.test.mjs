@@ -28,3 +28,14 @@ test('Header usa o usuario da sessao', () => {
   assert.match(header, /user\.email/);
   assert.doesNotMatch(header, /ricardo\.lima@ideen\.tech/);
 });
+
+test('DataProvider fica dentro do guard, chaveado pelo id do usuario', () => {
+  assert.doesNotMatch(read('src/main.tsx'), /DataProvider/);
+  assert.match(read('src/App.tsx'), /<DataProvider key=\{session\.user\.id\}>/);
+});
+
+test('App nao trata query ?error= e aceita /reset-password/', () => {
+  const app = read('src/App.tsx');
+  assert.doesNotMatch(app, /queryParams|access_denied|forbidden/);
+  assert.match(app, /'\/reset-password\/'/);
+});
