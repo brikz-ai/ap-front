@@ -1,57 +1,46 @@
 import { useState } from 'react';
-import { HttpError, googleStartUrl, login } from '../../auth/auth';
-import { AuthShell, ErrorNote, Field, PasswordInput, inputClass, primaryBtnClass } from './AuthShell';
+import { entrar } from '../../auth/auth';
+import { AuthShell, ErrorNote, Field, inputClass, primaryBtnClass } from './AuthShell';
 
-// Login unico com o brikz-iam: Google (SSO) ou e-mail e senha. O login()
-// guarda a sessao e o App reage via onSessionChange.
-export function LoginScreen({
-  onForgot,
-  initialError,
-}: {
-  onForgot: () => void;
-  initialError?: string | null;
-}) {
+// Tela de login do AP, no visual dos fronts brikz. A senha NUNCA e digitada
+// aqui: quem autentica e o Keycloak (auth.brikz.ai, realm ap). Esta tela so
+// escolhe o caminho e pula a tela padrao dele:
+//   - Google: direto para o Google (kc_idp_hint=google);
+//   - e-mail: o Keycloak recebe o e-mail pronto (login_hint) e pede so a senha.
+export function LoginScreen({ initialError, voltar }: { initialError?: string | null; voltar?: string | null }) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [indo, setIndo] = useState(false);
   const [error, setError] = useState<string | null>(initialError ?? null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function ir(opcoes: { google?: boolean; email?: string }) {
     setError(null);
+    setIndo(true);
+    try {
+      await entrar({ ...opcoes, voltar });
+    } catch {
+      // Sem rede ou Keycloak fora do ar (a descoberta OIDC falhou).
+      setIndo(false);
+      setError('Não foi possível conectar. Tente novamente.');
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Informe um e-mail válido.');
       return;
     }
-    if (!password) {
-      setError('Informe sua senha.');
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await login(email, password);
-    } catch (err) {
-      setSubmitting(false);
-      // fetch rejeita com TypeError sem rede; o IAM responde 400 para credenciais ruins
-      if (err instanceof HttpError && err.status === 400) setError('E-mail ou senha inválidos');
-      else if (err instanceof TypeError) setError('Não foi possível conectar');
-      else setError('Não foi possível entrar. Tente novamente.');
-    }
-  }
-
-  function handleGoogle() {
-    setError(null);
-    window.location.href = googleStartUrl();
+    void ir({ email });
   }
 
   return (
-    <AuthShell
-      eyebrow="Acesso"
-      title="Entrar no Trava-AP"
-      subtitle="Acesse com sua conta Google ou com e-mail e senha."
-    >
-      <button type="button" onClick={handleGoogle} className="btn btn-soft mt-7 w-full justify-center gap-3 py-2.5">
+    <AuthShell eyebrow="Acesso" title="Entrar no AP" subtitle="Use sua conta Google da brikz ou o e-mail da sua empresa.">
+      <button
+        type="button"
+        onClick={() => void ir({ google: true })}
+        disabled={indo}
+        className="btn btn-soft mt-7 w-full justify-center gap-3 py-2.5"
+      >
         <GoogleIcon />
         Entrar com Google
       </button>
@@ -66,7 +55,7 @@ export function LoginScreen({
         <Field label="E-mail">
           <input
             type="email"
-            autoComplete="email"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="voce@empresa.com"
@@ -74,30 +63,16 @@ export function LoginScreen({
           />
         </Field>
 
-        <Field
-          label="Senha"
-          hint={
-            <button type="button" onClick={onForgot} className="text-xs font-medium text-cyan-700 hover:underline">
-              Esqueceu?
-            </button>
-          }
-        >
-          <PasswordInput
-            value={password}
-            onChange={setPassword}
-            show={showPassword}
-            onToggle={() => setShowPassword((s) => !s)}
-            placeholder="Sua senha"
-            autoComplete="current-password"
-          />
-        </Field>
-
         {error && <ErrorNote>{error}</ErrorNote>}
 
-        <button type="submit" disabled={submitting} className={primaryBtnClass}>
-          {submitting ? 'Entrando…' : 'Entrar'}
+        <button type="submit" disabled={indo} className={primaryBtnClass}>
+          {indo ? 'Redirecionando…' : 'Continuar'}
         </button>
       </form>
+
+      <p className="mt-6 text-center text-xs text-gray-400">
+        Acesso restrito. O cadastro é feito pelo administrador da sua empresa.
+      </p>
     </AuthShell>
   );
 }

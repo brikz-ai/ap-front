@@ -9,7 +9,8 @@ steps:
       - --build-arg=VITE_FINANCIADOR_ID=$_FINANCIADOR_ID
       - --build-arg=VITE_OPTIN_API_BASE_URL=$_OPTIN_URL
       - --build-arg=VITE_AGENDA_API_BASE_URL=$_AGENDA_URL
-      - --build-arg=VITE_AUTH_API_URL=$_AUTH_URL
+      - --build-arg=VITE_KEYCLOAK_ISSUER=$_KEYCLOAK_ISSUER
+      - --build-arg=VITE_KEYCLOAK_CLIENT_ID=$_KEYCLOAK_CLIENT_ID
       - .
 images:
   - southamerica-east1-docker.pkg.dev/$PROJECT_ID/front/ap-front:$_TAG

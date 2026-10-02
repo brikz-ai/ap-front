@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Pré-requisitos:
 #   - gcloud autenticado com acesso ao projeto (gcloud auth login)
-#   - .env na raiz com as VITE_* (URLs dos backends, auth e FINANCIADOR_ID).
+#   - .env na raiz com as VITE_* (URLs dos backends, Keycloak e FINANCIADOR_ID).
 #     As VITE_* são embutidas no bundle público no build.
 #
 # Infra já existente no projeto:
@@ -37,7 +37,7 @@ set -a
 . ./.env
 set +a
 
-for v in VITE_CONTRATOS_API_BASE_URL VITE_OPTIN_API_BASE_URL VITE_AGENDA_API_BASE_URL VITE_AUTH_API_URL VITE_FINANCIADOR_ID; do
+for v in VITE_CONTRATOS_API_BASE_URL VITE_OPTIN_API_BASE_URL VITE_AGENDA_API_BASE_URL VITE_KEYCLOAK_ISSUER VITE_KEYCLOAK_CLIENT_ID VITE_FINANCIADOR_ID; do
   if [ -z "${!v:-}" ]; then
     echo "Erro: $v vazia no .env." >&2
     exit 1
@@ -55,7 +55,7 @@ gcloud builds submit . \
   --project "${PROJECT_ID}" \
   --region "${REGION}" \
   --config cloudbuild.yaml \
-  --substitutions="_TAG=${TAG},_CONTRATOS_URL=${VITE_CONTRATOS_API_BASE_URL},_FINANCIADOR_ID=${VITE_FINANCIADOR_ID},_OPTIN_URL=${VITE_OPTIN_API_BASE_URL},_AGENDA_URL=${VITE_AGENDA_API_BASE_URL},_AUTH_URL=${VITE_AUTH_API_URL}"
+  --substitutions="_TAG=${TAG},_CONTRATOS_URL=${VITE_CONTRATOS_API_BASE_URL},_FINANCIADOR_ID=${VITE_FINANCIADOR_ID},_OPTIN_URL=${VITE_OPTIN_API_BASE_URL},_AGENDA_URL=${VITE_AGENDA_API_BASE_URL},_KEYCLOAK_ISSUER=${VITE_KEYCLOAK_ISSUER},_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}"
 
 for R in ${DEPLOY_REGIONS}; do
   echo "Deploy no Cloud Run (${R})..."

@@ -1,34 +1,35 @@
-// Sessao do Trava-AP com o brikz-iam (login unico). Port enxuto de
-// frontend-fidexa/src/lib/auth.ts: sem Firebase e sem cookie de SSR.
+// Sessao do AP com o Keycloak (auth.brikz.ai, realm ap, client publico
+// ap-console): authorization code + PKCE S256 via oidc-client-ts. A senha
+// nunca passa por aqui: a tela /login so escolhe o caminho (Google direto ou
+// e-mail como login_hint) e o Keycloak autentica. O access token vai no
+// Authorization: Bearer de toda chamada aos backends (ver authFetch) e e
+// renovado em silencio com o refresh token antes de expirar.
 // Sintaxe TS apagavel de proposito (importavel pelo node --test).
+import { UserManager, WebStorageStateStore, type User } from 'oidc-client-ts';
+
 const env = (import.meta as { env?: Record<string, string | undefined> }).env;
-export const AUTH_URL: string = env?.VITE_AUTH_API_URL ?? 'http://localhost:8004';
+export const KEYCLOAK_ISSUER: string = (env?.VITE_KEYCLOAK_ISSUER || 'https://auth.brikz.ai/realms/ap').replace(/\/+$/, '');
+export const KEYCLOAK_CLIENT_ID: string = env?.VITE_KEYCLOAK_CLIENT_ID || 'ap-console';
 
-export type ModulePerms = { view: boolean; create: boolean; edit: boolean; delete: boolean };
-export type PermissionMap = Record<string, ModulePerms>;
+export const LOGIN_PATH = '/login';
+export const CALLBACK_PATH = '/auth/callback';
 
-export type AuthUser = {
-  id: number;
-  name: string;
-  email: string;
-  cpf: string;
-  fone_number: string;
-  is_staff: boolean;
-  is_superuser: boolean;
-  is_active: boolean;
-  must_change_password?: boolean;
-  role?: number | null;
-  role_name?: string | null;
-  permissions?: PermissionMap;
+export type AuthUser = { id: string; name: string; email: string };
+export type Session = { user: AuthUser; access: string };
+
+// Subconjunto do UserManager que o app usa (os testes trocam por um falso).
+export type Gerenciador = Pick<
+  UserManager,
+  'getUser' | 'signinRedirect' | 'signinRedirectCallback' | 'signinSilent' | 'signoutRedirect' | 'removeUser'
+> & {
+  events: Pick<UserManager['events'], 'addUserLoaded' | 'addUserUnloaded'>;
 };
 
-export type Session = { user: AuthUser; access: string; refresh: string };
+let gerenciador: Gerenciador | null = null;
+let atual: User | null = null;
+let inicio: Promise<{ erro: string | null }> | null = null;
+let renovando: Promise<User | null> | null = null;
 
-const ACCESS_KEY = 'brikz.ap.auth.access';
-const REFRESH_KEY = 'brikz.ap.auth.refresh';
-const USER_KEY = 'brikz.ap.auth.user';
-
-// --- Mudanca de sessao ------------------------------------------------------
 const listeners = new Set<() => void>();
 
 export function onSessionChange(cb: () => void): () => void {
@@ -39,193 +40,149 @@ export function onSessionChange(cb: () => void): () => void {
 }
 
 function emitSessionChange(): void {
-  for (const cb of [...listeners]) {
-    try {
-      cb();
-    } catch {
-      // um ouvinte quebrado nao pode afetar os demais
-    }
-  }
+  listeners.forEach((cb) => cb());
 }
 
-// --- Armazenamento ----------------------------------------------------------
-export function storeSession(s: Session): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(ACCESS_KEY, s.access);
-  localStorage.setItem(REFRESH_KEY, s.refresh);
-  localStorage.setItem(USER_KEY, JSON.stringify(s.user));
+function definirAtual(u: User | null): void {
+  atual = u && !u.expired ? u : null;
   emitSessionChange();
 }
 
-export function clearSession(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(ACCESS_KEY);
-  localStorage.removeItem(REFRESH_KEY);
-  localStorage.removeItem(USER_KEY);
-  emitSessionChange();
+function ligarEventos(g: Gerenciador): Gerenciador {
+  // userLoaded dispara no login e em cada renovacao silenciosa; userUnloaded
+  // no logout e quando a sessao some do storage.
+  g.events.addUserLoaded((u) => definirAtual(u));
+  g.events.addUserUnloaded(() => definirAtual(null));
+  return g;
 }
 
-function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(REFRESH_KEY);
+function obterGerenciador(): Gerenciador {
+  if (gerenciador) return gerenciador;
+  const origem = window.location.origin;
+  gerenciador = ligarEventos(
+    new UserManager({
+      authority: KEYCLOAK_ISSUER,
+      client_id: KEYCLOAK_CLIENT_ID,
+      redirect_uri: `${origem}${CALLBACK_PATH}`,
+      post_logout_redirect_uri: `${origem}${LOGIN_PATH}`,
+      response_type: 'code',
+      scope: 'openid profile email',
+      // Renova com o refresh token um pouco antes do access token (5 min) vencer.
+      automaticSilentRenew: true,
+      // localStorage: a sessao vale para todas as abas do AP, como antes.
+      userStore: new WebStorageStateStore({ store: window.localStorage }),
+    }),
+  );
+  return gerenciador;
+}
+
+// Testes: injeta um gerenciador falso e zera o estado do modulo.
+export function usarGerenciador(g: Gerenciador | null): void {
+  gerenciador = g ? ligarEventos(g) : null;
+  atual = null;
+  inicio = null;
+  renovando = null;
+}
+
+function usuarioDe(u: User): AuthUser {
+  const p = u.profile;
+  const email = typeof p.email === 'string' ? p.email : '';
+  const nome = [p.name, p.preferred_username, email].find((v) => typeof v === 'string' && v.trim());
+  return { id: p.sub, name: (nome as string | undefined) ?? 'Usuário', email };
 }
 
 export function getSession(): Session | null {
-  if (typeof window === 'undefined') return null;
-  const access = localStorage.getItem(ACCESS_KEY);
-  const refresh = localStorage.getItem(REFRESH_KEY);
-  const raw = localStorage.getItem(USER_KEY);
-  if (!access || !refresh || !raw) return null;
+  if (!atual || atual.expired) return null;
+  return { user: usuarioDe(atual), access: atual.access_token };
+}
+
+// So aceita caminho interno ("/x"), nunca "//host" ou URL absoluta: o voltar
+// vem da query e iria direto para o history depois do login.
+export function voltarSeguro(v: string | null | undefined): string {
+  if (!v || !v.startsWith('/') || v.startsWith('//') || v.startsWith('/\\')) return '/';
+  if (v === LOGIN_PATH || v.startsWith(`${LOGIN_PATH}?`) || v.startsWith(CALLBACK_PATH)) return '/';
+  return v;
+}
+
+// Vai para o Keycloak. Google: kc_idp_hint pula a tela do Keycloak e cai
+// direto no Google. E-mail: segue como login_hint, ja preenchido la.
+export async function entrar(opcoes: { google?: boolean; email?: string; voltar?: string | null } = {}): Promise<void> {
+  const email = opcoes.email?.trim().toLowerCase();
+  await obterGerenciador().signinRedirect({
+    ...(opcoes.google ? { extraQueryParams: { kc_idp_hint: 'google' } } : {}),
+    ...(email ? { login_hint: email } : {}),
+    state: { voltar: voltarSeguro(opcoes.voltar) },
+  });
+}
+
+export async function sair(): Promise<void> {
+  // end_session do Keycloak (encerra a sessao SSO) e volta para /login.
+  // O oidc-client-ts manda o id_token_hint e apaga o usuario do storage.
   try {
-    return { access, refresh, user: JSON.parse(raw) as AuthUser };
+    await obterGerenciador().signoutRedirect();
   } catch {
-    return null;
+    await obterGerenciador().removeUser();
+    definirAtual(null);
+    window.location.assign(LOGIN_PATH);
   }
 }
 
-// Extrai uma mensagem legivel de um erro do DRF: {detail} ou {campo:[msgs]}.
-async function errorMessage(res: Response, fallback: string): Promise<string> {
-  try {
-    const data = await res.json();
-    if (typeof data?.detail === 'string') return data.detail;
-    const first = Object.values(data ?? {})[0];
-    if (Array.isArray(first) && typeof first[0] === 'string') return first[0];
-    if (typeof first === 'string') return first;
-  } catch {
-    // corpo nao-JSON: usa o fallback
-  }
-  return fallback;
-}
-
-// --- Chamadas ao IAM --------------------------------------------------------
-export class HttpError extends Error {
-  status: number;
-  constructor(message: string, status: number) {
-    super(message);
-    this.name = 'HttpError';
-    this.status = status;
-  }
-}
-
-export async function login(email: string, password: string): Promise<Session> {
-  const res = await fetch(`${AUTH_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) throw new HttpError(await errorMessage(res, 'Falha ao entrar.'), res.status);
-  const session = (await res.json()) as Session;
-  storeSession(session);
-  return session;
-}
-
-// Com `access` informado (retorno do Google): sessao ainda nao existe, entao
-// fetch cru. Sem argumento: via authFetch (anexa token e renova em 401).
-export async function fetchMe(access?: string): Promise<AuthUser> {
-  const url = `${AUTH_URL}/api/auth/me`;
-  const res = access
-    ? await fetch(url, { headers: { Authorization: `Bearer ${access}` } })
-    : await authFetch(url);
-  if (!res.ok) throw new Error(await errorMessage(res, 'Sessão inválida.'));
-  return (await res.json()) as AuthUser;
-}
-
-// O IAM nunca revela se o e-mail existe (200 generico). return_to faz o link
-// do e-mail voltar para esta origem.
-export async function requestPasswordReset(email: string): Promise<void> {
-  const res = await fetch(`${AUTH_URL}/api/auth/password/reset`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, return_to: window.location.origin }),
-  });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Falha ao solicitar a redefinição.'));
-}
-
-export async function confirmPasswordReset(uid: string, token: string, password: string): Promise<void> {
-  const res = await fetch(`${AUTH_URL}/api/auth/password/reset/confirm`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid, token, password }),
-  });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Não foi possível redefinir a senha.'));
-}
-
-export async function changePassword(current: string, next: string): Promise<void> {
-  const res = await authFetch(`${AUTH_URL}/api/auth/password/change`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ current_password: current, new_password: next }),
-  });
-  if (!res.ok) throw new Error(await errorMessage(res, 'Não foi possível alterar a senha.'));
-}
-
-// --- Google -----------------------------------------------------------------
-export function googleStartUrl(): string {
-  return `${AUTH_URL}/api/auth/google/start?return_to=${encodeURIComponent(window.location.origin)}`;
-}
-
-// O callback volta para a origem com #access=..&refresh=.. Le e limpa o hash.
-export function consumeLoginHash(): { access: string; refresh: string } | null {
-  if (typeof window === 'undefined') return null;
-  const hash = window.location.hash;
-  if (!hash || hash.length < 2) return null;
-  const params = new URLSearchParams(hash.slice(1));
-  const access = params.get('access');
-  const refresh = params.get('refresh');
-  if (!access || !refresh) return null;
-  window.history.replaceState(null, '', window.location.pathname + window.location.search);
-  return { access, refresh };
-}
-
-// --- Refresh ----------------------------------------------------------------
-// Apenas 401/403 do proprio endpoint de refresh mata a sessao; rede/5xx sao
-// transientes e preservam a sessao.
-export type RefreshResult =
-  | { status: 'ok'; access: string }
-  | { status: 'dead' }
-  | { status: 'transient' };
-
-let inFlightRefresh: Promise<RefreshResult> | null = null;
-
-export function refreshAccess(): Promise<RefreshResult> {
-  if (inFlightRefresh) return inFlightRefresh;
-  const pending: Promise<RefreshResult> = performRefresh().finally(() => {
-    if (inFlightRefresh === pending) inFlightRefresh = null;
-  });
-  inFlightRefresh = pending;
-  return pending;
-}
-
-async function performRefresh(): Promise<RefreshResult> {
-  const refresh = getRefreshToken();
-  if (!refresh) return { status: 'dead' };
-
-  let res: Response;
-  try {
-    res = await fetch(`${AUTH_URL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh }),
+// Renovacao silenciosa (refresh token), uma por vez.
+function renovar(): Promise<User | null> {
+  if (renovando) return renovando;
+  const pendente: Promise<User | null> = obterGerenciador()
+    .signinSilent()
+    .catch(() => null)
+    .finally(() => {
+      if (renovando === pendente) renovando = null;
     });
-  } catch {
-    return { status: 'transient' };
-  }
-
-  if (res.status === 401 || res.status === 403) return { status: 'dead' };
-  if (!res.ok) return { status: 'transient' };
-
-  try {
-    const { access } = (await res.json()) as { access?: unknown };
-    if (typeof access !== 'string' || !access) return { status: 'transient' };
-    localStorage.setItem(ACCESS_KEY, access);
-    return { status: 'ok', access };
-  } catch {
-    return { status: 'transient' };
-  }
+  renovando = pendente;
+  return pendente;
 }
 
-// Fetch com JWT: anexa o Bearer; em 401 renova uma vez e repete. Se o refresh
-// for recusado (401/403), limpa a sessao (o App reage via onSessionChange).
+async function carregarSessao(): Promise<void> {
+  const g = obterGerenciador();
+  let u = await g.getUser();
+  if (u && u.expired) u = await renovar();
+  if (!u) await g.removeUser();
+  definirAtual(u);
+}
+
+async function concluirLogin(): Promise<string> {
+  const u = await obterGerenciador().signinRedirectCallback();
+  definirAtual(u);
+  return voltarSeguro((u.state as { voltar?: string } | undefined)?.voltar);
+}
+
+// Boot do app, uma vez por carga (o StrictMode roda efeitos 2x): na volta do
+// Keycloak (/auth/callback) troca o code pelos tokens; senao recupera a sessao
+// guardada, renovando se o access token ja venceu.
+export function iniciarSessao(): Promise<{ erro: string | null }> {
+  if (inicio) return inicio;
+  inicio = (async () => {
+    if (window.location.pathname === CALLBACK_PATH) {
+      try {
+        const destino = await concluirLogin();
+        window.history.replaceState(null, '', destino);
+        return { erro: null };
+      } catch {
+        window.history.replaceState(null, '', LOGIN_PATH);
+        return { erro: 'Não foi possível entrar. Tente novamente.' };
+      }
+    }
+    try {
+      await carregarSessao();
+    } catch {
+      definirAtual(null);
+    }
+    return { erro: null };
+  })();
+  return inicio;
+}
+
+// Fetch com o access token do Keycloak: anexa o Bearer; em 401 renova uma vez
+// e repete. Se a renovacao falhar, a sessao acabou: limpa e o App volta ao
+// /login (via onSessionChange).
 export async function authFetch(input: string, init: RequestInit = {}): Promise<Response> {
   const withAuth = (t: string | null): RequestInit => {
     const headers = new Headers(init.headers || {});
@@ -233,14 +190,16 @@ export async function authFetch(input: string, init: RequestInit = {}): Promise<
     return { ...init, headers };
   };
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem(ACCESS_KEY) : null;
+  const token = getSession()?.access ?? null;
   const res = await fetch(input, withAuth(token));
-  if (res.status !== 401) return res;
+  if (res.status !== 401 || !token) return res;
 
-  const refreshed = await refreshAccess();
-  if (refreshed.status === 'transient') return res;
-  if (refreshed.status === 'ok') return fetch(input, withAuth(refreshed.access));
-
-  clearSession();
-  return res;
+  const novo = await renovar();
+  if (!novo || novo.expired) {
+    await obterGerenciador().removeUser();
+    definirAtual(null);
+    return res;
+  }
+  definirAtual(novo);
+  return fetch(input, withAuth(novo.access_token));
 }

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-// Shell visual das telas de auth (login, esqueci/redefinir senha): painel de
-// marca ink a esquerda (telas largas) + formulario a direita sobre grade sutil.
-// Port do AuthShell do fidexa, com a marca brikz | Trava-AP.
+// Shell visual da tela de login: painel de marca ink a esquerda (telas
+// largas) + formulario a direita sobre grade sutil. Mesmo visual do login dos
+// fronts brikz (fidexa, AML Control), com a marca brikz | AP.
 const GRID_LIGHT = {
   backgroundImage:
     'linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)',
@@ -44,7 +44,7 @@ export function AuthShell({
         <div className="relative flex items-center gap-3 self-start">
           <img src="/brand/logo-on-dark.png" alt="brikz" className="h-9 w-auto" />
           <span className="h-5 w-px bg-white/25" aria-hidden="true" />
-          <span className="font-display text-lg font-semibold tracking-[-0.01em] text-white">Trava-AP</span>
+          <span className="font-display text-lg font-semibold tracking-[-0.01em] text-white">AP</span>
         </div>
 
         <div className="relative max-w-sm space-y-4">
@@ -70,7 +70,7 @@ export function AuthShell({
           <div className="mb-8 flex items-center gap-2.5 lg:hidden">
             <img src="/brand/logo-on-light.png" alt="brikz" className="h-8 w-auto" />
             <span className="h-4 w-px bg-gray-200" aria-hidden="true" />
-            <span className="font-display text-base font-semibold tracking-[-0.01em] text-gray-900">Trava-AP</span>
+            <span className="font-display text-base font-semibold tracking-[-0.01em] text-gray-900">AP</span>
           </div>
 
           <span className="eyebrow">{eyebrow}</span>
@@ -86,8 +86,6 @@ export function AuthShell({
 
 export const inputClass = 'input-soft w-full';
 export const primaryBtnClass = 'btn btn-primary w-full justify-center';
-export const linkClass = 'font-semibold text-cyan-700 hover:underline';
-
 export function Field({
   label,
   hint,
@@ -113,49 +111,5 @@ export function ErrorNote({ children }: { children: ReactNode }) {
     <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
       {children}
     </p>
-  );
-}
-
-export function InfoNote({ children }: { children: ReactNode }) {
-  return (
-    <p className="rounded-md border border-cyan-100 bg-cyan-50 px-3 py-2 text-sm font-medium text-cyan-700">
-      {children}
-    </p>
-  );
-}
-
-export function PasswordInput({
-  value,
-  onChange,
-  show,
-  onToggle,
-  placeholder,
-  autoComplete,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  show: boolean;
-  onToggle: () => void;
-  placeholder: string;
-  autoComplete: string;
-}) {
-  return (
-    <div className="relative">
-      <input
-        type={show ? 'text' : 'password'}
-        autoComplete={autoComplete}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`${inputClass} pr-16`}
-      />
-      <button
-        type="button"
-        onClick={onToggle}
-        className="absolute inset-y-0 right-0 flex items-center pr-3 text-xs font-medium text-gray-400 hover:text-gray-700"
-      >
-        {show ? 'Ocultar' : 'Mostrar'}
-      </button>
-    </div>
   );
 }

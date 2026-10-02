@@ -20,16 +20,13 @@ import { OverviewModule } from './components/OverviewModule';
 import { NewClientModal } from './components/NewClientModal';
 import { ImportClientsModal } from './components/ImportClientsModal';
 import { LoginScreen } from './components/auth/LoginScreen';
-import { ForgotPasswordScreen } from './components/auth/ForgotPasswordScreen';
-import { ResetPasswordScreen } from './components/auth/ResetPasswordScreen';
-import { ChangePasswordScreen } from './components/auth/ChangePasswordScreen';
 import {
-  clearSession,
-  consumeLoginHash,
-  fetchMe,
+  LOGIN_PATH,
   getSession,
+  iniciarSessao,
   onSessionChange,
-  storeSession,
+  sair,
+  voltarSeguro,
   type AuthUser,
 } from './auth/auth';
 import { OptInSignature } from './components/OptInSignature';
@@ -189,7 +186,7 @@ function AppContent({ user }: { user: AuthUser }) {
   };
 
   const handleLogout = () => {
-    clearSession();
+    void sair();
   };
 
   // Nomes mock de aprovadores para simular usuários distintos
@@ -560,91 +557,60 @@ function AppContent({ user }: { user: AuthUser }) {
   );
 }
 
-// Retorno do Google: o IAM volta para a origem com #access=..&refresh=.. (ou
-// #error=..). Consumido uma unica vez por carga (StrictMode roda efeitos 2x).
-type Boot = { tokens: { access: string; refresh: string } | null; googleError: string | null };
-let bootCache: Boot | null = null;
-let bootMePromise: Promise<void> | null = null;
-
-function readBoot(): Boot {
-  if (bootCache) return bootCache;
-  const tokens = consumeLoginHash();
-  let googleError: string | null = null;
-  // Reservado para um futuro redirect de erro do IAM (#error=..). Hoje o
-  // google_callback responde JSON em erro e nao redireciona.
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  if (!tokens && hashParams.get('error')) {
-    googleError = 'Não foi possível entrar com o Google. Tente novamente.';
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-  }
-  bootCache = { tokens, googleError };
-  return bootCache;
-}
-
-function isResetPath(p: string): boolean {
-  return p === '/reset-password' || p === '/reset-password/';
-}
-
+// Login pelo Keycloak (ver src/auth/auth.ts). Sem sessao, qualquer rota cai
+// em /login?voltar=<rota>; depois do login o app volta para ela.
 function App() {
   const isSignaturePage = window.location.pathname.startsWith('/optin-signature/');
-  const [boot] = useState(readBoot);
   const [session, setSession] = useState(() => getSession());
-  const [bootstrapping, setBootstrapping] = useState(() => !!boot.tokens);
-  const [bootError, setBootError] = useState<string | null>(boot.googleError);
-  const [showForgot, setShowForgot] = useState(false);
-  const [isResetRoute, setIsResetRoute] = useState(() => isResetPath(window.location.pathname));
+  const [carregando, setCarregando] = useState(!isSignaturePage);
+  const [erroLogin, setErroLogin] = useState<string | null>(null);
 
   useEffect(() => onSessionChange(() => setSession(getSession())), []);
 
   useEffect(() => {
-    if (!boot.tokens) return;
-    const { access, refresh } = boot.tokens;
-    if (!bootMePromise) {
-      bootMePromise = fetchMe(access).then((user) => {
-        storeSession({ user, access, refresh });
-      });
-    }
+    if (isSignaturePage) return;
     let cancelled = false;
-    bootMePromise
-      .catch(() => {
-        if (!cancelled) setBootError('Não foi possível entrar com o Google. Tente novamente.');
+    iniciarSessao()
+      .then(({ erro }) => {
+        if (!cancelled && erro) setErroLogin(erro);
       })
       .finally(() => {
-        if (!cancelled) setBootstrapping(false);
+        if (!cancelled) {
+          setSession(getSession());
+          setCarregando(false);
+        }
       });
     return () => {
       cancelled = true;
     };
-  }, [boot]);
+  }, [isSignaturePage]);
+
+  // Mantem a URL coerente com o estado da sessao (/login sem sessao; fora do
+  // /login com sessao).
+  const naTelaDeLogin = window.location.pathname === LOGIN_PATH;
+  useEffect(() => {
+    if (isSignaturePage || carregando) return;
+    if (!session && !naTelaDeLogin) {
+      const voltar = window.location.pathname + window.location.search;
+      const q = voltar === '/' ? '' : `?voltar=${encodeURIComponent(voltar)}`;
+      window.history.replaceState(null, '', `${LOGIN_PATH}${q}`);
+    } else if (session && naTelaDeLogin) {
+      const voltar = new URLSearchParams(window.location.search).get('voltar');
+      window.history.replaceState(null, '', voltarSeguro(voltar));
+    }
+  }, [isSignaturePage, carregando, session, naTelaDeLogin]);
 
   if (isSignaturePage) return <OptInSignature />;
 
-  if (isResetRoute) {
-    const params = new URLSearchParams(window.location.search);
-    return (
-      <ResetPasswordScreen
-        uid={params.get('uid') ?? ''}
-        token={params.get('token') ?? ''}
-        onDone={() => {
-          window.history.replaceState(null, '', '/');
-          setIsResetRoute(false);
-          setShowForgot(false);
-        }}
-      />
-    );
-  }
-
-  if (bootstrapping) {
+  if (carregando) {
     return <LoadingSpinner size="lg" text="Entrando..." fullScreen />;
   }
 
   if (!session) {
-    if (showForgot) return <ForgotPasswordScreen onBack={() => setShowForgot(false)} />;
-    return <LoginScreen onForgot={() => setShowForgot(true)} initialError={bootError} />;
-  }
-
-  if (session.user.must_change_password) {
-    return <ChangePasswordScreen user={session.user} />;
+    const voltar = naTelaDeLogin
+      ? new URLSearchParams(window.location.search).get('voltar')
+      : window.location.pathname + window.location.search;
+    return <LoginScreen initialError={erroLogin} voltar={voltar} />;
   }
 
   return (

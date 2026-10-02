@@ -34,7 +34,7 @@ test('login tem painel ink com logo on-dark', () => {
 });
 
 test('copy do login segue o DS (sem exclamacao)', () => {
-  for (const f of ['AuthShell', 'LoginScreen', 'ForgotPasswordScreen', 'ResetPasswordScreen', 'ChangePasswordScreen']) {
+  for (const f of ['AuthShell', 'LoginScreen']) {
     const src = read(`src/components/auth/${f}.tsx`);
     const jsxText = [...src.matchAll(/>([^<>{}]+)</g)].map(m => m[1]).join(' ');
     assert.doesNotMatch(jsxText, /!/, f);
@@ -43,7 +43,7 @@ test('copy do login segue o DS (sem exclamacao)', () => {
   }
 });
 
-test('nome do produto Trava-AP ao lado do logo', () => {
+test('nome do produto ao lado do logo (Trava-AP na sidebar, AP no login)', () => {
   assert.match(read('src/components/Sidebar.tsx'), />Trava-AP</);
-  assert.match(read('src/components/auth/AuthShell.tsx'), />Trava-AP</);
+  assert.match(read('src/components/auth/AuthShell.tsx'), />AP</);
 });
